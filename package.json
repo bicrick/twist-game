@@ -8,8 +8,6 @@
     "preview": "vite preview",
     "test": "node tools/check_levels.js",
     "paths": "node tools/paths.js",
-    "build:embed": "EMBED=1 VITE_SITE=https://twist-embed.vercel.app vite build --outDir embed/twist-embed --emptyOutDir",
-    "deploy:embed": "npm run build:embed && vercel deploy embed/twist-embed --prod --yes",
     "deploy": "vercel deploy --prod --yes --build-env COMMIT=$(git rev-parse --short HEAD)"
   },
   "dependencies": {

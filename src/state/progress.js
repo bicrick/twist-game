@@ -1,9 +1,9 @@
 // Saved progress (localStorage). Changing the keys resets everyone's progress.
 // Levels flagged `challenge: true` are optional: they never gate the next world.
-import { WORLDS } from '../data/worlds.js';
+import { WORLDS, EMBED } from '../data/worlds.js';
 
 // Bump these when levels are reordered/replaced (saved progress is keyed by world:level index).
-const DONE = 'twist-done4';
+const DONE = EMBED ? 'twist-embed-done' : 'twist-done4';       // the /embed taster keeps its own progress
 let done = {};
 try { done = JSON.parse(localStorage.getItem(DONE) || '{}'); } catch (e) {}
 const save = () => { try { localStorage.setItem(DONE, JSON.stringify(done)); } catch (e) {} };
@@ -29,7 +29,7 @@ export const challengeCount = w => WORLDS[w].levels.filter((d, l) => d.challenge
 export const worldPerfect = w => WORLDS[w].levels.every((_, l) => isDone(w, l));   // main + challenges
 export const allPerfect = () => WORLDS.every((_, w) => worldPerfect(w));
 // one-time moments (the finale, 100%) so they only play once
-const FLAGS = 'twist-flags'; let flags = {};
+const FLAGS = EMBED ? 'twist-embed-flags' : 'twist-flags'; let flags = {};
 try { flags = JSON.parse(localStorage.getItem(FLAGS) || '{}'); } catch (e) {}
 export const flag = k => !!flags[k];
 export const setFlag = k => { flags[k] = 1; try { localStorage.setItem(FLAGS, JSON.stringify(flags)); } catch (e) {} };

@@ -1,0 +1,9 @@
+{
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/embed",
+      "destination": "/index.html"
+    }
+  ]
+}
