@@ -1,4 +1,6 @@
 import { startApp } from './ui/app.js';
+import { disableZoom } from './ui/nozoom.js';
+disableZoom();
 startApp();
 
 // offline support in production builds only
