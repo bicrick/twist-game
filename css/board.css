@@ -1,7 +1,7 @@
 /* The board: floor, walls, pads, seams, reflected copies. Shared by levels and rooms. */
 /* boards are SQUARE-edged: a glued world tiles edge to edge with its reflections. Solid edges get a wall rim instead. */
-#floor { position: relative; background: var(--floor); transition: background .5s ease; }   /* no frame: a glued edge is not a border; solid edges get the rim */
-.copy { position: absolute; z-index: 1; background: var(--floor); transition: background .5s ease; contain: layout style; }
+#floor { position: relative; background: radial-gradient(ellipse farthest-corner at 50% 50%, var(--floor) 40%, color-mix(in srgb, var(--floor) 52%, transparent) 100%); }   /* solid in the middle, see-through toward the edges so the drifting particles show */   /* no frame: a glued edge is not a border; solid edges get the rim */
+.copy { position: absolute; z-index: 1; background: color-mix(in srgb, var(--floor) 60%, transparent); contain: layout style; }
 .cell { position: absolute; width: var(--cell); height: var(--cell); }
 /* walls: bright clay stones with a darker underside */
 /* walls: bright clay slabs: darker underside + soft top highlight. Neighbouring walls MERGE into one slab (no seams),
