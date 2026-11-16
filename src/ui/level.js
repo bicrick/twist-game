@@ -231,5 +231,5 @@ function finish() {
   if (finale || perfect) setTimeout(() => celebrate(perfect ? 'perfect' : 'clear'), 750);
 }
 export const rebuild = () => build();
-export const peek = () => ({ player: state.player, blocks: state.blocks, hist: hist.length, redo: redoStack.length });   // for tests
+export const peek = () => ({ w: wi, l: li, player: state.player, blocks: state.blocks, hist: hist.length, redo: redoStack.length });   // for tests
 export const debugSet = f => { state = f(state); update(); };

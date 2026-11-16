@@ -1,6 +1,6 @@
 // Screen router: hub -> world room -> level. Owns which screen is showing.
 import { nav } from './nav.js';
-import { showHub, showWorld, roomMove } from './rooms.js';
+import { showHub, showWorld, roomMove, roomInfo } from './rooms.js';
 import * as level from './level.js';
 import { bindInput } from './input.js';
 import { initControls, setPadState } from './controls.js';
@@ -62,6 +62,6 @@ export function startApp() {
   addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => swap(() => { if (mode === 'level') level.rebuild(); else if (mode === 'world') showWorld(world, null); else if (mode === 'hub') showHub(null); else showTitle(); }, { dir: 'fade' }), 120); });
 
   // test hooks (used by browser checks)
-  Object.assign(window, { __level: level, __progress: progress, __enter: nav.level, __world: w => nav.world(w, null), __hub: () => nav.hub(null), __done: progress.allDone, __set: level.debugSet });
+  Object.assign(window, { __room: roomInfo, __level: level, __progress: progress, __enter: nav.level, __world: w => nav.world(w, null), __hub: () => nav.hub(null), __done: progress.allDone, __set: level.debugSet });
   nav.title(true);
 }

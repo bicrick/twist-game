@@ -140,3 +140,6 @@ export function roomMove(dr, dc) {
   puff(players[0].parentNode, (pos[1] + .5) * cell, (pos[0] + .5) * cell, cell, dr, dc);
   pos = [r, c]; place(); stepBot(players[0], dr, dc); sfx.roomStep();
 }
+
+// read-only view of the current room for browser tests (they walk it with real key presses)
+export const roomInfo = () => room && ({ mode: room.mode, pos, W: room.W, H: room.H, doors: room.doors.map(d => ({ r: d.r, c: d.c, locked: /locked/.test(d.cls || '') })), walls: room.map ? [...room.map.m.walls] : [] });
