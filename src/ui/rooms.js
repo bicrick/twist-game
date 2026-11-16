@@ -12,7 +12,7 @@ import { WORLDS } from '../data/worlds.js';
 import * as progress from '../state/progress.js';
 
 export const COLS = 5;
-const DECOR = { lr: 'plain', tb: 'plain' };
+const DECOR = { lr: 'twist', tb: 'twist' }; // decorative: copies mirror like a twisted level
 let room = null, pos = [0, 0], players = [], cell = 64;
 
 function preview(def, box) {
