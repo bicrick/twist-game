@@ -20,6 +20,9 @@ Every world also has optional **challenge levels** (they never block progress). 
 ## Testing on a real phone
 Open `https://twist-game.vercel.app/?debug=1` and screenshot the small panel (frame rate, viewport, touch type, safe-area insets, installed/offline state). Add to Home Screen to try the installed version.
 
+## Audits
+`node tools/audit_levels.mjs` (level variety / difficulty ramp) and `npm i --no-save puppeteer-core && node tools/audit_touch.mjs` (real-Chrome touch audit across phone/tablet profiles; defaults to the live site).
+
 ## Develop
 ```bash
 npm install
