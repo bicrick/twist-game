@@ -13,21 +13,24 @@ export const sfx = {
   unlock: () => unlock(),
   toggle() { on = !on; setEnabled(on); try { localStorage.setItem('twist-sound', on ? 'on' : 'off'); } catch (e) {} if (on) play('toggle'); return on; },
 
+  // Cue choices follow Cuelume's own "which cue for what" table (node_modules/cuelume/README.md).
   // level
-  move:     cue('type',   { key: 'printable', emphasis: 'subtle' }),
-  push:     cue('tap',    { input: 'keyboard' }),
-  wrap:     cue('navigate'),                       // crossed a seam
-  flip:     cue('toggle'),                         // orientation changed (twist seam or pad)
-  blocked:  cue('error',  { emphasis: 'subtle' }),
-  match:    cue('ready'),                          // a target / home just lit up
-  win:      cue('success', { emphasis: 'strong' }),
-  undo:     () => play('toggle', { direction: 'back', emphasis: 'subtle' }),
-  restart:  cue('warning', { emphasis: 'subtle' }),
+  move:     cue('type',   { key: 'printable', emphasis: 'subtle' }),   // a step: keystroke
+  push:     cue('tap',    { input: 'keyboard' }),                      // shoving a block: direct contact
+  wrap:     cue('navigate'),                                           // crossing a seam: a whoosh to elsewhere
+  flip:     cue('toggle'),                                             // orientation switched (twist seam / pad)
+  blocked:  cue('error',  { emphasis: 'subtle' }),                     // refused move
+  match:    cue('ready'),                                              // a target / home just lit up, not done yet
+  win:      cue('success', { emphasis: 'strong' }),                    // level solved
+  undo:     () => play('navigate', { direction: 'back', emphasis: 'subtle' }),
+  restart:  cue('close',  { emphasis: 'subtle' }),                     // discard and start over
 
   // menus
-  roomStep: cue('type',   { key: 'printable', emphasis: 'subtle' }),
-  openDoor: cue('open'),
-  back:     cue('close'),
-  locked:   cue('error'),
-  unlocked: cue('attention'),
+  roomStep:   cue('type', { key: 'printable', emphasis: 'subtle', volume: .5 }),
+  enterWorld: cue('navigate'),                                         // route change
+  enterLevel: cue('open'),                                             // dive into a level
+  leave:      cue('close'),                                            // leave a level
+  back:       () => play('navigate', { direction: 'back' }),           // back door / Esc in a room
+  locked:     cue('error'),                                            // refused: world still locked
+  unlocked:   cue('ready',  { emphasis: 'strong' }),                   // a new world is available
 };

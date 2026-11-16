@@ -22,7 +22,7 @@ export function start(w, l) {
   hideBanner(); build();
 }
 export const restart = () => { sfx.restart(); start(wi, li); };
-export const leave = () => { sfx.back(); nav.world(wi, li); };
+export const leave = () => { sfx.leave(); nav.world(wi, li); };
 
 function addCells(root, L) {
   for (let r = 0; r < L.H; r++) for (let c = 0; c < L.W; c++) {

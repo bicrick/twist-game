@@ -4,7 +4,7 @@
 .door .num { position: absolute; left: 6%; top: 3%; font: 800 calc(var(--cell) * .2)/1 var(--font); color: rgba(255,255,255,.95); z-index: 3; text-shadow: 0 1px 0 rgba(0,0,0,.25); }
 .door .tick { position: absolute; right: 5%; top: 5%; width: 26%; height: 26%; border-radius: 50%; background: var(--home); color: #fff;
               font: 800 calc(var(--cell) * .17)/1 var(--font); display: flex; align-items: center; justify-content: center; z-index: 3; }
-.door.exit { background: rgba(0,0,0,.28); font: 800 calc(var(--cell) * .42)/1 var(--font); }
+.door.exit { border-radius: 50%; }
 .door.locked { filter: saturate(.25) brightness(.92); }
 .door.bump { animation: bump .25s ease; }
 @keyframes bump { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
@@ -15,3 +15,13 @@
 .door .lock { position: absolute; left: 50%; top: 60%; width: 34%; height: 34%; transform: translate(-50%, -50%); color: rgba(0,0,0,.5); }
 .mini { position: relative; display: grid; border-radius: 3px; }
 .mini i { display: block; }
+
+/* world-room map: trail segments, back door */
+.cell.trail::before { content: ''; position: absolute; left: 50%; top: 50%; width: 22%; height: 22%; transform: translate(-50%, -50%);
+                      border-radius: 50%; background: color-mix(in srgb, var(--wall) 20%, transparent); }
+.cell .seg { position: absolute; background: color-mix(in srgb, var(--wall) 20%, transparent); }
+.cell .seg.n { left: 39%; width: 22%; top: 0; height: 50%; }
+.cell .seg.s { left: 39%; width: 22%; top: 50%; bottom: 0; }
+.cell .seg.w { top: 39%; height: 22%; left: 0; width: 50%; }
+.cell .seg.e { top: 39%; height: 22%; left: 50%; right: 0; }
+.door.exit .icon { width: 56%; height: 56%; color: #fff; }

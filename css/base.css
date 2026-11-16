@@ -1,6 +1,6 @@
 /* Theme tokens: restyle the whole game from here. Per-world colours are set at runtime (ui/theme.js). */
 :root {
-  --bg: #d9d2c5; --floor: #ece6da; --wall: #4a4338;
+  --bg: #d9d2c5; --floor: #ece6da; --wall: #8a8171;
   --player: #ff9f40; --block: #f2b705; --home: #37b36b; --okc: #2fc27a;
   --plain: #1fb5a3; --twist: #8b5cf6; --padc: #d6498f;
   --ink: rgba(0, 0, 0, .55); --ink-soft: rgba(0, 0, 0, .38);

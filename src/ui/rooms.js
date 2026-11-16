@@ -1,6 +1,6 @@
 // Menu rooms: the hub (worlds) and a world room (levels). They use the same board
 // as a level: seams, reflected copies. Seams here are decorative; walking stays inside the room.
-import { $, el, LOCK_SVG, svgIcon } from './dom.js';
+import { $, el, LOCK_SVG, BACK_SVG, svgIcon } from './dom.js';
 import { createBoard } from './board.js';
 import { piece, orient } from './pieces.js';
 import { theme } from './theme.js';
@@ -9,9 +9,9 @@ import { roomCell } from './layout.js';
 import { nav } from './nav.js';
 import { sfx } from '../audio/sfx.js';
 import { WORLDS } from '../data/worlds.js';
+import { parseMap, joined, isDoor } from '../data/roommap.js';
 import * as progress from '../state/progress.js';
 
-export const COLS = 5;
 const DECOR = { lr: 'twist', tb: 'twist' }; // decorative: copies mirror like a twisted level
 let room = null, pos = [0, 0], players = [], cell = 64;
 
@@ -40,6 +40,23 @@ function preview(def, box) {
   return m;
 }
 
+const RADS = ['34% 28% 32% 30% / 30% 34% 28% 36%', '28% 34% 30% 36% / 34% 28% 36% 30%', '32% 30% 36% 28% / 28% 36% 30% 34%'];
+function addCells(root, spec) {
+  const mp = spec.map;
+  for (let r = 0; r < spec.H; r++) for (let c = 0; c < spec.W; c++) {
+    const k = r + ',' + c, d = el('cell', root);
+    if (!mp) continue;
+    if (mp.m.walls.has(k)) { d.classList.add('wall'); d.style.setProperty('--rad', RADS[(r * 3 + c * 5) % 3]); }
+    else if (mp.m.path.has(k)) {
+      d.classList.add('trail');
+      [['n', -1, 0], ['e', 0, 1], ['s', 1, 0], ['w', 0, -1]].forEach(([n, dr, dc]) => {
+        const q = [r + dr, c + dc];
+        if (q[0] >= 0 && q[1] >= 0 && q[0] < spec.H && q[1] < spec.W && joined(mp.m, [r, c], q, mp.rows)) el('seg ' + n, d);
+      });
+    }
+  }
+}
+
 // spec: { W, H, hue, doors:[{r,c,cls,color,fill(node,size),act()}], chip, hint }
 function build(spec) {
   room = spec; theme(spec.hue);
@@ -50,7 +67,7 @@ function build(spec) {
   players = [];
   spec.doors.forEach(d => { d.nodes = []; });
   createBoard(st, { W: spec.W, H: spec.H, ...DECOR }, cell, (root, key) => {
-    for (let i = 0; i < spec.W * spec.H; i++) el('cell', root);
+    addCells(root, spec);
     spec.doors.forEach(d => {
       const b = el('door' + (d.cls ? ' ' + d.cls : ''), root); d.nodes.push(b);
       b.style.width = b.style.height = size + 'px';
@@ -81,7 +98,7 @@ export function showHub(from) {
         w.levels.forEach((_, l) => { const i = document.createElement('i'); if (l < n) i.className = 'on'; pips.appendChild(i); });
       },
       act() {
-        if (open) { sfx.openDoor(); nav.world(i, null); }
+        if (open) { sfx.enterWorld(); nav.world(i, null); }
         else { bump(this); sfx.locked(); banner('Locked', 'Finish ' + WORLDS[i - 1].name + ' first', 2200); }
       },
     };
@@ -92,22 +109,33 @@ export function showHub(from) {
 }
 
 export function showWorld(w, from) {
-  const def = WORLDS[w], n = def.levels.length, rows = Math.ceil(n / COLS), H = 2 * rows + 1;
-  pos = from == null ? [H - 1, 2] : [2 + 2 * Math.floor(from / COLS), 1 + 2 * (from % COLS)];
+  const def = WORLDS[w], m = parseMap(def.map);
+  const spot = from == null ? m.start : standNextTo(m, m.levels[from]);
+  pos = [...spot];
   const doors = def.levels.map((d, l) => ({
-    r: 1 + 2 * Math.floor(l / COLS), c: 1 + 2 * (l % COLS), color: `hsl(${def.hue} 45% 58%)`,
+    r: m.levels[l][0], c: m.levels[l][1], color: `hsl(${def.hue} 45% 58%)`,
     fill(b, size) { b.appendChild(preview(d, size)); el('num', b).textContent = l + 1; if (progress.isDone(w, l)) el('tick', b).textContent = '✓'; },
-    act() { sfx.openDoor(); nav.level(w, l); },
+    act() { sfx.enterLevel(); nav.level(w, l); },
   }));
-  doors.push({ r: H - 1, c: 0, cls: 'exit', fill(b) { b.textContent = '←'; }, act() { sfx.back(); nav.hub(w); } });
-  build({ W: 2 * COLS + 1, H, hue: def.hue, doors, chip: def.name, hint: 'WASD move  ·  walk into a level to enter it  ·  arrow = back' });
+  doors.push({ r: m.exit[0], c: m.exit[1], cls: 'exit', color: `hsl(${def.hue} 30% 40%)`,
+    fill(b) { b.appendChild(svgIcon(BACK_SVG, 'icon')); }, act() { sfx.back(); nav.hub(w); } });
+  build({ W: m.W, H: m.H, hue: def.hue, doors, map: { m, rows: def.map }, chip: def.name, hint: 'WASD move  ·  walk into a level to enter it' });
   room.mode = 'world';
   if (!progress.introSeen(w)) { progress.markIntroSeen(w); banner(def.name, def.intro, 6500); }
+}
+// a free cell beside a door, preferring below it
+function standNextTo(m, [r, c]) {
+  for (const [dr, dc] of [[1, 0], [0, 1], [0, -1], [-1, 0]]) {
+    const rr = r + dr, cc = c + dc;
+    if (rr >= 0 && cc >= 0 && rr < m.H && cc < m.W && !m.walls.has(rr + ',' + cc) && !isDoor(m, rr, cc)) return [rr, cc];
+  }
+  return m.start;
 }
 
 export function roomMove(dr, dc) {
   const r = pos[0] + dr, c = pos[1] + dc;
   if (r < 0 || c < 0 || r >= room.H || c >= room.W) return;
+  if (room.map && room.map.m.walls.has(r + ',' + c)) return;
   const door = room.doors.find(d => d.r === r && d.c === c);
   if (door) { door.act(); return; }
   pos = [r, c]; place(); sfx.roomStep();
