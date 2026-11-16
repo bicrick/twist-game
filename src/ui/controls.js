@@ -2,6 +2,7 @@
 // Pure input: turns presses into the same intents as the keyboard (see input.js).
 //   D-pad = move (hold to repeat, slide to change direction)   Undo / Redo / Reset (greyed when unavailable)   Back   Menu
 import { $, el } from './dom.js';
+import { blockDoubleTapZoom } from './doubletap.js';
 
 const ARROW = '<svg viewBox="0 0 24 24"><path d="M12 6 5 17h14z" fill="currentColor"/></svg>';
 const ROT = { up: 0, right: 90, down: 180, left: 270 };
@@ -9,6 +10,7 @@ const DIR = { up: [-1, 0], down: [1, 0], left: [0, -1], right: [0, 1] };
 const wantsPad = () => matchMedia('(pointer: coarse)').matches || innerWidth < 640 || /[?&]pad=1/.test(location.search);
 
 export function initControls(h) {
+  blockDoubleTapZoom(); // pad and the rest of the play surface; pointerdown preventDefault does not stop it
   const root = document.documentElement, pad = $('pad');
   const sync = () => root.classList.toggle('with-pad', wantsPad());
   sync(); addEventListener('resize', sync); // keep first: the app's resize handler reads the new screen size

@@ -24,6 +24,7 @@ export function bindInput(h) {
   // Some iOS webviews only unlock audio on touchend, and they scroll/rubber-band unless the move is cancelled.
   addEventListener('touchend', () => h.gesture(), { passive: true, capture: true });
   addEventListener('touchmove', e => {
+    if (e.touches.length > 1) return; // pinch-zoom stays available; the viewport is scalable on purpose
     if (e.target.closest && e.target.closest('#menu .card')) return;
     if (e.cancelable) e.preventDefault();
   }, { passive: false, capture: true });

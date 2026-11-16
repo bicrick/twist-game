@@ -4,7 +4,7 @@
         --pad-label: rgba(255,255,255,.45); --pad-u: clamp(38px, 6.2vh, 54px); --pad-u: clamp(38px, 6.2dvh, 54px); --pad-side: clamp(150px, 24vw, 210px); }
 #pad { display: none; }
 html.with-pad #device { background: var(--pad-body); }
-html.with-pad #pad { display: block; position: absolute; z-index: 50; touch-action: none; }
+html.with-pad #pad { display: block; position: absolute; z-index: 50; touch-action: manipulation; }
 html.with-pad #screen { border-radius: 12px; box-shadow: 0 0 0 2px #1d2a35; background: var(--bg); transition: background .5s ease; }
 
 /* portrait: screen on top, pad below */
@@ -26,7 +26,7 @@ html.with-pad #screen { border-radius: 12px; box-shadow: 0 0 0 2px #1d2a35; back
 }
 
 .dpad, .acts, .mid { position: absolute; pointer-events: auto; }
-.dpad { width: calc(var(--pad-u) * 3); height: calc(var(--pad-u) * 3); touch-action: none; }
+.dpad { width: calc(var(--pad-u) * 3); height: calc(var(--pad-u) * 3); touch-action: manipulation; }
 .dpad .cross { position: absolute; inset: 0; pointer-events: none; }
 /* flat cross: four arms + a centre piece. Pressing slides that arm straight toward the centre (no tilt). */
 .dpad .arm, .dpad .center { position: absolute; width: 33.4%; height: 33.4%; background: var(--pad-key);
@@ -50,7 +50,7 @@ html.with-pad #screen { border-radius: 12px; box-shadow: 0 0 0 2px #1d2a35; back
 /* action cluster: Reset on top, Undo / Redo below. Icon buttons; .dim = nothing to do right now */
 .acts { width: calc(var(--pad-u) * 3.1); height: calc(var(--pad-u) * 2.7); }
 .act { position: absolute; width: calc(var(--pad-u) * 1.35); height: calc(var(--pad-u) * 1.35); border: 0; padding: 0; border-radius: 34%; display: grid; place-items: center;
-       color: #fff; touch-action: none; box-shadow: 0 3px 0 rgba(0,0,0,.45); transition: opacity .15s ease, transform .06s ease; }
+       color: #fff; touch-action: manipulation; box-shadow: 0 3px 0 rgba(0,0,0,.45); transition: opacity .15s ease, transform .06s ease; }
 .act svg { width: 52%; height: 52%; }
 .act.reset { left: 50%; top: 0; margin-left: calc(var(--pad-u) * -.675); background: #f59e0b; }
 .act.undo { left: 0; bottom: 0; background: var(--pad-a); }
@@ -60,7 +60,7 @@ html.with-pad #screen { border-radius: 12px; box-shadow: 0 0 0 2px #1d2a35; back
 
 /* bottom row: two ordinary buttons, side by side, no tilt */
 .mid { display: flex; gap: 12px; justify-content: center; align-items: center; }
-.pbtn { min-width: 84px; padding: 9px 20px; border: 0; border-radius: 13px; background: var(--pad-key); color: rgba(255,255,255,.85); font: 600 14px/1 var(--font); touch-action: none; box-shadow: 0 3px 0 rgba(0,0,0,.4); }
+.pbtn { min-width: 84px; padding: 9px 20px; border: 0; border-radius: 13px; background: var(--pad-key); color: rgba(255,255,255,.85); font: 600 14px/1 var(--font); touch-action: manipulation; box-shadow: 0 3px 0 rgba(0,0,0,.4); }
 .pbtn:active, .pbtn.on { background: var(--pad-key-hi); transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.4); }
 
 /* while a menu is open the action cluster becomes one big OK button (the D-pad moves / adjusts, Back closes) */
