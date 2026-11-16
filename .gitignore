@@ -4,3 +4,4 @@ dist
 *.out
 tools/paths.json
 .vercel
+.env*

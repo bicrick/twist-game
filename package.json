@@ -7,7 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node tools/check_levels.js",
-    "paths": "node tools/paths.js"
+    "paths": "node tools/paths.js",
+    "deploy": "vercel deploy --prod --yes"
   },
   "dependencies": {
     "cuelume": "^0.2.8"

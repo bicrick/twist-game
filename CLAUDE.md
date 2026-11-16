@@ -6,6 +6,7 @@ The whole idea, in the user's words: *a Grok-bot-esque twist on Patrick's Parabo
 ## Run / test
 - `npm install`, `npm run dev` (http://localhost:5173), `npm run build` (static site in `dist/`), `npm test` (every level solvable + unique, room maps valid, groups valid).
 - `npm run paths` writes `tools/paths.json` (solutions for every level). Replay them in the browser through real key events to verify a full playthrough (see "Verification").
+- Live: https://twist-game.vercel.app (Vercel project `twist-game`, account bicrick; redeploy with `npx vercel deploy --prod --yes`, or `npm run deploy`). Linked via `.vercel/` (gitignored). Vite is auto-detected (build `npm run build`, output `dist`).
 - CI: `.github/workflows/pages.yml` tests, builds and deploys `dist/` to GitHub Pages on push to main.
 
 ## Game
