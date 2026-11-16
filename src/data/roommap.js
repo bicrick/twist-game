@@ -1,7 +1,7 @@
 // Parses a world's ASCII room map. Pure (no DOM); tools/check_levels.js validates every map with it.
 //   #  stone (blocks walking)   .  floor   ,  trail (decorative path, walkable)
 // Rows may have any amount of empty space around them: parseMap crops and re-pads (see normalize).
-//   S  where the player stands on entry   X  back door   0-9a-z  level index (base 36)
+//   X  back door (the player starts standing on it unless the map has an S)   S  optional start cell   0-9a-z  level index (base 36)
 export const MARGIN = 1;
 // Crop the map to its content, then add MARGIN empty cells on every side, so nothing ever touches the border.
 function normalize(rows) {
@@ -25,6 +25,7 @@ export function parseMap(raw) {
       else if (/[0-9a-z]/.test(ch)) { m.levels[parseInt(ch, 36)] = [r, c]; m.path.add(k); }
     });
   });
+  if (!m.start) m.start = m.exit;        // no S: the player starts standing on the back button
   return m;
 }
 // two path cells are visibly joined by a trail segment

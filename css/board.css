@@ -1,16 +1,17 @@
 /* The board: floor, walls, pads, seams, reflected copies. Shared by levels and rooms. */
-#floor { position: relative; background: var(--floor); box-shadow: 0 0 0 var(--b) var(--outline); transition: background .5s ease; }
-.copy { position: absolute; z-index: 1; background: var(--floor); box-shadow: 0 0 0 var(--b) var(--outline); transition: background .5s ease; contain: layout style; }
+/* boards are SQUARE-edged: a glued world tiles edge to edge with its reflections. Solid edges get a wall rim instead. */
+#floor { position: relative; background: var(--floor); box-shadow: 0 0 0 1px color-mix(in srgb, var(--wall-shade) 14%, transparent); transition: background .5s ease; }
+.copy { position: absolute; z-index: 1; background: var(--floor); transition: background .5s ease; contain: layout style; }
 .cell { position: absolute; width: var(--cell); height: var(--cell); }
-/* walls: bright flat tile with a darker band underneath; neighbours merge into one slab */
-.cell.wall::before { content: ''; position: absolute; inset: 0; background: var(--wall); box-shadow: inset 0 calc(var(--cell) * -.16) 0 var(--wall-shade); }
+/* walls: bright clay stones with a darker underside */
+.cell.wall::before { content: ''; position: absolute; inset: 3%; background: var(--wall); border-radius: 36%;
+  box-shadow: inset 0 calc(var(--cell) * -.12) 0 var(--wall-shade); }
 .cell.pad::after { content: ''; position: absolute; inset: 14%; background: color-mix(in srgb, var(--padc) 16%, transparent);
-  border: var(--b) solid var(--padc); display: flex; align-items: center; justify-content: center;
+  border: var(--b) solid var(--padc); border-radius: 28%; display: flex; align-items: center; justify-content: center;
   font: 800 calc(var(--cell) * .4)/1 var(--font); color: var(--padc); }
 .cell.pad.x::after { content: '\2194'; } .cell.pad.y::after { content: '\2195'; }
 
-/* seams: hairlines only */
-.edge { position: absolute; z-index: 6; pointer-events: none; opacity: .6; }
-.edge.plain { background: var(--plain); }
-.edge.twist { background: var(--twist); }
-.edge.none { background: var(--outline); opacity: 1; }
+/* (no seam lines: the mirrored reflections already show which edges are glued, and how) */
+
+/* solid borders: a clay wall rim just outside the board edge */
+.rim { position: absolute; z-index: 6; background: var(--wall); border-radius: calc(var(--cell) * .13); box-shadow: inset 0 calc(var(--cell) * -.06) 0 var(--wall-shade); pointer-events: none; }

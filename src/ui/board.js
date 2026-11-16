@@ -4,18 +4,17 @@
 import { el } from './dom.js';
 import { screenSize } from './layout.js';
 
-// Seams: thin, faint lines. (Reflections already say "this edge is glued".)
-function bars(floor, B, cell) {
-  const { W: cw, H: ch, lr, tb } = B;
-  const W = cw * cell, H = ch * cell, t = 2;
-  const line = (type, css) => Object.assign(el('edge ' + type, floor).style, css);
-  line(tb, { left: -t / 2 + 'px', top: -t / 2 + 'px', width: W + t + 'px', height: t + 'px' });
-  line(tb, { left: -t / 2 + 'px', top: H - t / 2 + 'px', width: W + t + 'px', height: t + 'px' });
-  line(lr, { left: -t / 2 + 'px', top: -t / 2 + 'px', width: t + 'px', height: H + t + 'px' });
-  line(lr, { left: W - t / 2 + 'px', top: -t / 2 + 'px', width: t + 'px', height: H + t + 'px' });
-}
-
 const MAX_PANES = 49;
+
+// Solid ('none') edges get a wall rim just outside the board; glued edges get nothing (the reflections show them).
+function rims(root, spec, cell) {
+  const { W: cw, H: ch, lr, tb } = spec, W = cw * cell, H = ch * cell, t = Math.round(cell * .22);
+  const lrN = lr === 'none', tbN = tb === 'none';
+  const bar = (x, y, w, h) => { const d = el('rim', root); Object.assign(d.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); };
+  const x0 = lrN ? -t : 0, wTB = W + (lrN ? 2 * t : 0);
+  if (tbN) { bar(x0, -t, wTB, t); bar(x0, H, wTB, t); }
+  if (lrN) { bar(-t, 0, t, H); bar(W, 0, t, H); }
+}
 
 /**
  * spec: { W, H, lr, tb ('none'|'plain'|'twist') }
@@ -33,7 +32,8 @@ export function createBoard(stage, spec, cell, fillPane) {
   let nJ = tb === 'none' ? 0 : Math.ceil((sh / 2 - bh / 2) / bh);
   nI = Math.max(0, nI); nJ = Math.max(0, nJ);
   while ((2 * nI + 1) * (2 * nJ + 1) > MAX_PANES && (nI > 1 || nJ > 1)) { if (nI >= nJ) nI--; else nJ--; }
-  fillPane(floor, 'm');
+  fillPane(floor, 'm'); rims(floor, spec, cell);
+  floor.dataset.rimTop = tb === 'none' ? Math.round(cell * .22) : 0;
   for (let i = -nI; i <= nI; i++) for (let j = -nJ; j <= nJ; j++) {
     if (!i && !j) continue;
     const d = Math.max(Math.abs(i), Math.abs(j));
@@ -42,8 +42,7 @@ export function createBoard(stage, spec, cell, fillPane) {
     cp.style.opacity = Math.max(.12, .48 * Math.pow(.62, d - 1));
     const flipY = lr === 'twist' && Math.abs(i) % 2 === 1, flipX = tb === 'twist' && Math.abs(j) % 2 === 1;
     cp.style.transform = `scale(${flipX ? -1 : 1}, ${flipY ? -1 : 1})`;
-    fillPane(cp, `c${i},${j}`);
+    fillPane(cp, `c${i},${j}`); rims(cp, spec, cell);
   }
-  bars(floor, spec, cell);
   return floor;
 }

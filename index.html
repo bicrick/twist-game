@@ -3,18 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#0b141b">
+<meta name="theme-color" content="#eef0f3">
 <title>Twist</title>
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/board.css">
 <link rel="stylesheet" href="css/pieces.css">
 <link rel="stylesheet" href="css/rooms.css">
 <link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/title.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <radialGradient id="botGrad" cx=".5" cy=".4" r=".68">
+    <stop offset="0" style="stop-color: color-mix(in srgb, var(--player) 62%, #fff)"/>
+    <stop offset=".55" style="stop-color: var(--player)"/>
+    <stop offset="1" style="stop-color: color-mix(in srgb, var(--player) 80%, #000)"/>
+  </radialGradient>
+  <path id="cloudShape"/>
+</defs></svg>
 <div id="device">
   <div id="screen">
-    <div id="top"><div id="banner"></div><div id="bar"><span id="chip"></span><div id="dots"></div></div></div>
+    <div id="top"><div id="bar"><span id="chip"></span><div id="dots"></div></div></div>
     <div id="stage"></div>
   </div>
   <div id="pad"></div>

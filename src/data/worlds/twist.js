@@ -3,11 +3,11 @@ export default {
   name: "Twist",
   sub: "edges that flip you over",
   icon: '<svg viewBox="0 0 24 24"><path d="M3 7c6 0 12 10 18 10M3 17c6 0 12-10 18-10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>',
-  hue: 205,
+  hue: 215,
   intro: "Walk off an edge and come back on the other side. Violet seams turn you — and anything you push — over.",
   // Room map (see ui/rooms.js): . floor  , trail  S start  X back door  0-9a-z level index
   map: [
-    'XS0,1,2,3..',
+    'X,0,1,2,3..',
     '........,..',
     '....4,,,,,6',
     '....,.....,',

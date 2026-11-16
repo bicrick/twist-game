@@ -1,4 +1,4 @@
-// Title + target dots + banner live in #top, which hugs the top edge of the current board.
+// The level title + target dots live in #top, which hugs the top edge of the current board.
 import { $ } from './dom.js';
 
 export const setTitle = text => { $('chip').textContent = text || ''; };
@@ -7,8 +7,9 @@ export const setTitle = text => { $('chip').textContent = text || ''; };
 // correct even while the stage is mid-transition.
 export function placeTop() {
   const st = $('stage'), f = $('floor'), top = $('top');
-  if (!f) return;
+  if (!f) { top.style.display = 'none'; return; }
+  top.style.display = '';
   top.style.left = st.offsetLeft + f.offsetLeft + 'px';
   top.style.width = f.offsetWidth + 'px';
-  top.style.top = st.offsetTop + f.offsetTop + 'px';
+  top.style.top = st.offsetTop + f.offsetTop - (+f.dataset.rimTop || 0) + 'px';   // sit above a wall rim, if any
 }

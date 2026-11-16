@@ -4,15 +4,15 @@ import { $, el, LOCK_SVG, BACK_SVG, svgIcon } from './dom.js';
 import { createBoard } from './board.js';
 import { piece, orient } from './pieces.js';
 import { theme } from './theme.js';
-import { banner } from './banner.js';
 import { setTitle } from './hud.js';
-import { whenIdle } from './transition.js';
 import { roomCell } from './layout.js';
 import { nav } from './nav.js';
 import { sfx } from '../audio/sfx.js';
 import { WORLDS } from '../data/worlds.js';
 import { parseMap, joined, isDoor } from '../data/roommap.js';
 import { previewURL } from './preview.js';
+import { setActiveBot, stepBot } from './bot.js';
+import { puff } from './fx.js';
 import * as progress from '../state/progress.js';
 
 const DECOR = { lr: 'twist', tb: 'twist' }; // decorative: copies mirror like a twisted level
@@ -46,7 +46,7 @@ function addContent(root, spec) {
 function build(spec) {
   room = spec; theme(spec.hue);
   cell = roomCell(spec.W, spec.H);
-  const st = $('stage'); st.innerHTML = ''; st.classList.remove('win'); st.style.margin = '';
+  const st = $('stage'); st.innerHTML = ''; st.classList.remove('win', 'title-mode'); st.style.margin = '';
   st.style.setProperty('--cell', cell + 'px');
   const size = Math.round(cell * .86), off = (cell - size) / 2;
   players = [];
@@ -60,11 +60,11 @@ function build(spec) {
       (d.nodes || (d.nodes = [])).push(b);
       d.fill(b, size);
     });
-    const p = piece('player', root, Math.round(cell * .76)); orient(p, { fx: 0, fy: 0 });
+    const p = piece("player", root, Math.round(cell * .8)); orient(p, { fx: 0, fy: 0 });
     p.style.transition = 'left .1s ease, top .1s ease';
     players.push(p);
   });
-  place();
+  place(); setActiveBot(players[0], Math.round(cell * .8));
   $('dots').innerHTML = ''; setTitle(spec.chip);
 }
 function place() { players.forEach(p => { p.style.left = pos[1] * cell + cell * .12 + 'px'; p.style.top = pos[0] * cell + cell * .12 + 'px'; }); }
@@ -75,7 +75,7 @@ export function showHub(from) {
   const doors = WORLDS.map((w, i) => {
     const open = progress.worldOpen(i);
     return {
-      r: 1, c: 1 + 2 * i, cls: open ? '' : 'locked', color: `hsl(${w.hue} 62% 50%)`,
+      r: 1, c: 1 + 2 * i, cls: open ? '' : 'locked', color: `hsl(${w.hue} 85% 56%)`,
       fill(b) {
         b.title = w.name; b.setAttribute('aria-label', w.name);
         if (!open) { b.appendChild(svgIcon(LOCK_SVG, 'lock')); return; }
@@ -85,7 +85,7 @@ export function showHub(from) {
       },
       act(o) {
         if (open) { sfx.enterWorld(); nav.world(i, null, o); }
-        else { bump(this); sfx.locked(); whenIdle(() => banner('Locked', 'Finish ' + WORLDS[i - 1].name + ' first', 2200)); }
+        else { bump(this); sfx.locked(); }
       },
     };
   });
@@ -97,7 +97,7 @@ export function showWorld(w, from) {
   const def = WORLDS[w], m = parseMap(def.map);
   pos = [...(from == null ? m.start : standNextTo(m, m.levels[from]))];
   const doors = def.levels.map((d, l) => ({
-    r: m.levels[l][0], c: m.levels[l][1], color: `hsl(${def.hue} 62% 50%)`,
+    r: m.levels[l][0], c: m.levels[l][1], color: `hsl(${def.hue} 85% 56%)`,
     fill(b, size) {
       const p = previewURL(d, size);
       const mini = el('mini', b); mini.style.cssText = `width:${p.w}px;height:${p.h}px;background-image:url(${p.url})`;
@@ -107,9 +107,8 @@ export function showWorld(w, from) {
   }));
   doors.push({ r: m.exit[0], c: m.exit[1], cls: 'exit',
     fill(b) { b.appendChild(svgIcon(BACK_SVG, 'icon')); }, act() { sfx.back(); nav.hub(w); } });
-  build({ W: m.W, H: m.H, hue: def.hue, doors, map: { m, rows: m.rows }, chip: def.name });
+  build({ W: m.W, H: m.H, hue: def.hue, doors, map: { m, rows: m.rows } });
   room.mode = 'world';
-  if (!progress.introSeen(w)) { progress.markIntroSeen(w); whenIdle(() => banner(def.name, def.intro, 6500)); }
 }
 // a free cell beside a door, preferring below it
 function standNextTo(m, [r, c]) {
@@ -126,5 +125,6 @@ export function roomMove(dr, dc) {
   if (room.map && room.map.m.walls.has(r + ',' + c)) return;
   const door = room.doors.find(d => d.r === r && d.c === c);
   if (door) { door.act([door.c * cell + cell / 2, door.r * cell + cell / 2]); return; }
-  pos = [r, c]; place(); sfx.roomStep();
+  puff(players[0].parentNode, (pos[1] + .5) * cell, (pos[0] + .5) * cell, cell, dr, dc);
+  pos = [r, c]; place(); stepBot(players[0], dr, dc); sfx.roomStep();
 }

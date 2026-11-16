@@ -1,11 +1,11 @@
 /* On-screen gamepad (Game Boy Advance emulator style). Shown on touch / small screens via html.with-pad.
    Restyle with the tokens below; layout is plain absolute positioning. */
-:root { --pad-body: #0e1218; --pad-body-2: #0e1218; --pad-key: #232a33; --pad-key-hi: #35404d; --pad-a: #ff5a3c; --pad-b: #ffd23f;
-        --pad-label: rgba(255,255,255,.5); --pad-u: clamp(38px, 6.2vh, 54px); --pad-side: clamp(150px, 24vw, 210px); }
+:root { --pad-body: #e6e8ec; --pad-body-2: #e6e8ec; --pad-key: #ffffff; --pad-key-hi: #dfe3ea; --pad-a: #2f7bff; --pad-b: #1fc46b;
+        --pad-label: #9aa1ad; --pad-u: clamp(38px, 6.2vh, 54px); --pad-side: clamp(150px, 24vw, 210px); }
 #pad { display: none; }
 html.with-pad #device { background: var(--pad-body); }
 html.with-pad #pad { display: block; position: absolute; z-index: 50; touch-action: none; }
-html.with-pad #screen { border-radius: 2px; box-shadow: 0 0 0 3px #000, 0 0 0 5px #232a33; background: var(--bg); transition: background .5s ease; }
+html.with-pad #screen { border-radius: 22px; box-shadow: 0 2px 10px rgba(0,0,0,.12); background: var(--bg); transition: background .5s ease; }
 
 /* portrait: screen on top, pad below */
 @media (orientation: portrait) {
@@ -30,7 +30,7 @@ html.with-pad #screen { border-radius: 2px; box-shadow: 0 0 0 3px #000, 0 0 0 5p
 .dpad .cross { position: absolute; inset: 0; pointer-events: none; }
 /* flat cross: four arms + a centre piece. Pressing slides that arm straight toward the centre (no tilt). */
 .dpad .arm, .dpad .center { position: absolute; width: 33.4%; height: 33.4%; background: var(--pad-key);
-        box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 3px 0 rgba(0,0,0,.3);
+        box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 3px 8px rgba(0,0,0,.06);
         transition: transform .07s ease-out, box-shadow .07s ease-out, background .07s ease-out; }
 .dpad .arm { display: flex; align-items: center; justify-content: center; color: var(--pad-label); }
 .dpad .arm svg { width: 46%; height: 46%; }
@@ -38,19 +38,19 @@ html.with-pad #screen { border-radius: 2px; box-shadow: 0 0 0 3px #000, 0 0 0 5p
 .dpad .arm.down { left: 33.3%; bottom: 0; border-radius: 0 0 var(--r-ui) var(--r-ui); }
 .dpad .arm.left { left: 0; top: 33.3%; border-radius: var(--r-ui) 0 0 var(--r-ui); }
 .dpad .arm.right { right: 0; top: 33.3%; border-radius: 0 var(--r-ui) var(--r-ui) 0; }
-.dpad .center { left: 33.3%; top: 33.3%; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 0 rgba(255,255,255,.08); }
-.dpad .dimple { width: 56%; height: 56%; border-radius: 50%; background: radial-gradient(circle at 50% 35%, rgba(0,0,0,.28), rgba(0,0,0,.08)); }
+.dpad .center { left: 33.3%; top: 33.3%; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: none; }
+.dpad .dimple { width: 56%; height: 56%; border-radius: 50%; background: radial-gradient(circle at 50% 35%, rgba(0,0,0,.1), rgba(0,0,0,.03)); }
 .dpad[data-dir=up] .arm.up { transform: translateY(3px); }
 .dpad[data-dir=down] .arm.down { transform: translateY(-3px); }
 .dpad[data-dir=left] .arm.left { transform: translateX(3px); }
 .dpad[data-dir=right] .arm.right { transform: translateX(-3px); }
 .dpad[data-dir=up] .arm.up, .dpad[data-dir=down] .arm.down, .dpad[data-dir=left] .arm.left, .dpad[data-dir=right] .arm.right
-  { background: var(--pad-key-hi); color: #fff; box-shadow: inset 0 2px 0 rgba(255,255,255,.06), 0 1px 0 rgba(0,0,0,.3); }
+  { background: var(--pad-key-hi); color: var(--ink); box-shadow: 0 1px 0 rgba(0,0,0,.12); }
 
 .abs { width: calc(var(--pad-u) * 3); height: calc(var(--pad-u) * 2.2); }
 .abs .b { position: absolute; width: calc(var(--pad-u) * 1.4); height: calc(var(--pad-u) * 1.4); border-radius: 50%; border: 0; padding: 0;
-          color: #111; font: 800 calc(var(--pad-u) * .5)/1 var(--font); touch-action: none;
-          box-shadow: 0 4px 0 rgba(0,0,0,.28), inset 0 3px 0 rgba(255,255,255,.18); }
+          color: #fff; font: 700 calc(var(--pad-u) * .5)/1 var(--font); touch-action: none;
+          box-shadow: 0 3px 0 rgba(0,0,0,.18); }
 .abs .b.a { right: 0; top: 0; background: var(--pad-a); }
 .abs .b.bb { left: 0; bottom: 0; background: var(--pad-b); }
 .abs .b:active, .abs .b.on { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.28); }
@@ -58,5 +58,5 @@ html.with-pad #screen { border-radius: 2px; box-shadow: 0 0 0 3px #000, 0 0 0 5p
 .mid { display: flex; gap: 26px; align-items: flex-start; }
 .mid .s { display: flex; flex-direction: column; align-items: center; gap: 13px; color: var(--pad-label); font: 700 9px/1 var(--font); letter-spacing: 1.4px; }
 .mid .s button { width: 40px; height: 12px; margin-top: 6px; border-radius: 2px; border: 0; padding: 0; background: var(--pad-key); transform: rotate(-22deg); touch-action: none;
-                 box-shadow: 0 2px 0 rgba(0,0,0,.25), inset 0 2px 0 rgba(255,255,255,.08); }
+                 box-shadow: 0 2px 0 rgba(0,0,0,.12); }
 .mid .s button:active, .mid .s button.on { background: var(--pad-key-hi); transform: rotate(-22deg) translateY(1px); }

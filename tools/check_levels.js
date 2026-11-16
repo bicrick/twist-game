@@ -14,10 +14,10 @@ WORLDS.forEach((w, wi) => {
   const m = parseMap(w.map);
   w.levels.forEach((_, li) => { if (!m.levels[li]) fail('MAP missing level', wi, li); });
   Object.keys(m.levels).forEach(i => { if (!w.levels[i]) fail('MAP has unknown level', wi, i); });
-  if (!m.start || !m.exit) fail('MAP needs S and X', wi);
+  if (!m.exit) fail('MAP needs an X (back door)', wi);
   else {
     const stops = new Set([...Object.values(m.levels), m.exit].map(p => p.join())), seenC = new Set([m.start.join()]), q = [m.start];
-    while (q.length) { const [r, c] = q.shift(); if (stops.has(r + ',' + c)) continue;
+    while (q.length) { const [r, c] = q.shift(); if (stops.has(r + ',' + c) && !(r === m.start[0] && c === m.start[1])) continue;
       for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const rr = r + dr, cc = c + dc, k = rr + ',' + cc;
         if (rr < 0 || cc < 0 || rr >= m.H || cc >= m.W || m.walls.has(k) || seenC.has(k)) continue; seenC.add(k); q.push([rr, cc]); } }
     [...stops].forEach(s => { if (!seenC.has(s)) fail('UNREACHABLE door', wi, s); });

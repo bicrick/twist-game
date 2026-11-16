@@ -1,0 +1,32 @@
+/* Title screen */
+#stage.title-mode { position: absolute; inset: 0; }
+.title { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+.hero { position: relative; width: 104px; height: 104px; margin-bottom: 6px; }
+.word { font: 800 clamp(60px, 13vw, 124px)/1 var(--font); letter-spacing: -.04em; color: var(--ink); }
+.tag { font: 500 17px/1.2 var(--font); color: var(--ink-soft); }
+.go { margin-top: 18px; padding: 13px 26px; border-radius: 18px; background: var(--ink); color: #fff; font: 600 18px/1 var(--font);
+      box-shadow: 0 3px 0 rgba(0,0,0,.25); display: flex; gap: 10px; align-items: center; animation: nudge 2.4s ease-in-out infinite; }
+.go kbd, .keys kbd { font: 600 12px/1 var(--font); padding: 3px 7px; border-radius: 7px; background: rgba(255,255,255,.2); }
+.keys kbd { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.15); margin-left: 4px; }
+.keys { position: absolute; bottom: 20px; left: 0; right: 0; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; font: 500 13px/1 var(--font); color: var(--ink-soft); }
+.count { position: absolute; left: 22px; bottom: 56px; font: 600 14px/1 var(--font); color: var(--ink-soft); }
+html.with-pad .keys { display: none; } html.with-pad .count { bottom: 20px; }
+@keyframes nudge { 50% { transform: translateY(-3px); } }
+/* drifting bots */
+.fbot { position: absolute; opacity: .92; animation: float 10s ease-in-out infinite alternate; filter: drop-shadow(0 6px 8px rgba(0,0,0,.12)); }
+@keyframes float { from { transform: translate(-10px, 8px) rotate(-4deg); } to { transform: translate(12px, -12px) rotate(5deg); } }
+.bot-body.tint { background: radial-gradient(circle farthest-corner at 24% 17%, color-mix(in srgb, var(--bc) 55%, #fff) 0%, var(--bc) 38%, color-mix(in srgb, var(--bc) 78%, #000) 100%); }
+
+/* bot shapes + faces for the drifting crowd (the player bot is always the charcoal squircle) */
+.fbot.s-circle .bot-body { border-radius: 50%; }
+.fbot.s-pebble .bot-body { border-radius: 62% 38% 56% 44% / 50% 58% 42% 50%; }
+.fbot.s-capsule .bot-body { border-radius: 50%; }
+.fbot.s-triangle .bot-body { border-radius: 0; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 12 L90 84 L10 84 Z' fill='black' stroke='black' stroke-width='14' stroke-linejoin='round'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 12 L90 84 L10 84 Z' fill='black' stroke='black' stroke-width='14' stroke-linejoin='round'/></svg>") center / 100% 100% no-repeat; }
+.fbot.s-hex .bot-body { border-radius: 0; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 8 L88 29 L88 71 L50 92 L12 71 L12 29 Z' fill='black' stroke='black' stroke-width='10' stroke-linejoin='round'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 8 L88 29 L88 71 L50 92 L12 71 L12 29 Z' fill='black' stroke='black' stroke-width='10' stroke-linejoin='round'/></svg>") center / 100% 100% no-repeat; }
+.fbot.s-cloud .bot-body { border-radius: 0; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><circle cx='33' cy='58' r='22'/><circle cx='56' cy='42' r='27'/><circle cx='74' cy='60' r='21'/><rect x='28' y='56' width='50' height='26' rx='13'/></g></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><circle cx='33' cy='58' r='22'/><circle cx='56' cy='42' r='27'/><circle cx='74' cy='60' r='21'/><rect x='28' y='56' width='50' height='26' rx='13'/></g></svg>") center / 100% 100% no-repeat; }
+.fbot.s-droplet .bot-body { border-radius: 0; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 5 C50 5 84 41 84 62 A34 34 0 0 1 16 62 C16 41 50 5 50 5 Z' fill='black'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 5 C50 5 84 41 84 62 A34 34 0 0 1 16 62 C16 41 50 5 50 5 Z' fill='black'/></svg>") center / 100% 100% no-repeat; }
+.fbot.s-triangle .gaze { transform: translateY(14%); } .fbot.s-droplet .gaze { transform: translateY(12%); }
+.fbot.f-happy .eye { height: 11%; width: 12%; border-radius: 99px 99px 0 0; animation: none; }
+.fbot.f-wide .eye { width: 14%; height: 14%; border-radius: 50%; }
+.fbot.f-surprised .eye { width: 15%; height: 15%; border-radius: 50%; }
+.fbot.f-neutral .eye { }

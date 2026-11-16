@@ -17,13 +17,13 @@ export function previewURL(def, box) {
   g.fillStyle = edge(def.lr); g.fillRect(0, 0, e, h); g.fillRect(w - e, 0, e, h);
   const at = a => a[0] + ',' + a[1], walls = new Set(def.walls.map(at)), blocks = new Set(def.blocks.map(at));
   const tg = new Set(def.targets.map(at)), pads = new Set((def.pads || []).map(at)), pk = at(def.player), hk = at(def.home);
-  const ring = (x, y, k, col) => { g.strokeStyle = col; g.lineWidth = 2; g.strokeRect(x + s * .14 + 1, y + s * .14 + 1, s * .72 - 2, s * .72 - 2); };
+  const ring = (x, y, k, col) => { g.beginPath(); g.roundRect(x + s * .14 + 1, y + s * .14 + 1, s * .72 - 2, s * .72 - 2, s * .26); g.strokeStyle = col; g.lineWidth = 2; g.stroke(); };
   for (let r = 0; r < def.h; r++) for (let c = 0; c < def.w; c++) {
     const k = r + ',' + c, x = e + c * s, y = e + r * s;
-    if (walls.has(k)) g.fillStyle = css('--wall'), g.fillRect(x, y, s, s);
+    if (walls.has(k)) rr(x + s * .04, y + s * .04, s * .92, s * .92, s * .34, css('--wall'));
     else if (pads.has(k) && !blocks.has(k) && k !== pk) { g.fillStyle = css('--padc'); g.fillRect(x + s * .25, y + s * .25, s * .5, s * .5); }
-    else if (blocks.has(k)) (g.fillStyle = css('--block'), g.fillRect(x + s * .12, y + s * .12, s * .76, s * .76));
-    else if (k === pk) (g.fillStyle = css('--player'), g.fillRect(x + s * .12, y + s * .12, s * .76, s * .76));
+    else if (blocks.has(k)) rr(x + s * .12, y + s * .12, s * .76, s * .76, s * .3, css('--block'));
+    else if (k === pk) rr(x + s * .12, y + s * .12, s * .76, s * .76, s * .3, css('--player'));
     else if (tg.has(k)) ring(x, y, k, css('--block'));
     else if (k === hk) ring(x, y, k, css('--player'));
   }

@@ -1,13 +1,14 @@
 /* Theme tokens: restyle the whole game from here. Per-world colours are set at runtime (ui/theme.js). */
 :root {
-  /* DESIGN TOKENS. Style rules: flat fills only, black outlines + hard offset shadows, no gradients/glows/blur,
-     zero corner radius in the game world (the touch pad may round). Per-world colours come from ui/theme.js. */
-  --bg: #0b141b; --floor: #14232d; --wall: #2fa8e8; --wall-shade: #1f7bb0; --trail: #22404f;
-  --player: #ff5a3c; --block: #ffd23f; --home: var(--player); --okc: #3ddc84;
-  --plain: #3be3c0; --twist: #ffb020; --padc: #6ff0ff;
-  --outline: #000; --ink: rgba(255,255,255,.92); --ink-soft: rgba(255,255,255,.5);
-  --font: 'DIN Alternate', 'Bahnschrift', 'Roboto Condensed', 'Arial Narrow', system-ui, sans-serif;
-  --r-ui: 4px;
+  /* DESIGN TOKENS. Look (inspired by the Grok Bot app): light, airy, white cards on soft tinted backgrounds,
+     vivid clay-coloured walls per world, pink cloud bot with white eyes, squircles everywhere, soft shadows,
+     no hard outlines. Per-world colours come from ui/theme.js. */
+  --bg: #eef0f3; --floor: #fbfcfd; --wall: #2f7bff; --wall-shade: #1d58c9; --trail: #e3e8ef;
+  --player: #ff4f9a; --block: #ff9a35; --home: var(--player); --okc: #1fc46b;
+  --plain: #19b88a; --twist: #f59e0b; --padc: #8a5cf5;
+  --ink: #1d1d1f; --ink-soft: #7c7c84;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  --r-ui: 10px;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; margin: 0; }
@@ -16,22 +17,17 @@ body { background: var(--bg); transition: background .5s ease; font-family: var(
 /* #device holds the game screen (and, on touch screens, the pad: see controls.css) */
 #device { position: fixed; inset: 0; }
 #screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-#stage { position: relative; --b: calc(var(--cell) * .045); }
+#stage { position: relative; --b: calc(var(--cell) * .04); }
 
 /* HUD: sits just above the top edge of the current board (positioned by ui/hud.js) */
 #top { position: absolute; z-index: 30; pointer-events: none; transform: translateY(-100%); padding-bottom: 10px; }
 #bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 16px; }
-#chip { font: 700 14px/1 var(--font); letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft); background: var(--bg); padding: 4px 8px; margin-left: -2px; }
+#chip { font: 600 14px/1 var(--font); color: var(--ink-soft); background: rgba(255,255,255,.85); padding: 6px 11px; margin-left: -2px; border-radius: 11px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
 #chip:empty { display: none; }
 #dots { display: flex; gap: 7px; }
-#dots i { width: 11px; height: 11px; border: 2.5px solid var(--block); background: transparent; transition: background .2s ease; }
+#dots i { width: 12px; height: 12px; border-radius: 38%; border: 2.5px solid var(--block); background: transparent; transition: background .2s ease; }
 #dots i.home { border-color: var(--home); }
 #dots i.on { background: var(--okc); border-color: var(--okc); }
-#banner { background: var(--bg); padding: 8px 14px; position: absolute; left: 50%; bottom: 100%; margin-bottom: 10px; width: max-content; max-width: min(86vw, 520px); transform: translate(-50%, 8px);
-          text-align: center; opacity: 0; transition: opacity .5s ease, transform .5s ease; }
-#banner.on { opacity: 1; transform: translate(-50%, 0); }
-#banner h1 { margin: 0; font: 800 24px/1.1 var(--font); color: var(--ink); letter-spacing: 2px; text-transform: uppercase; }
-#banner p { margin: 5px 0 0; font: 600 13px/1.3 var(--font); color: var(--ink-soft); letter-spacing: .5px; }
 
 /* screen transitions (see ui/transition.js) */
 #stage { will-change: transform, opacity; }
