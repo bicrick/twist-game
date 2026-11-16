@@ -1,6 +1,8 @@
 // Every sound the game makes, by game event. Retune or swap the library here only.
 // Cues come from the vendored Cuelume library (synthesized Web Audio, no files).
-import { play, setEnabled, unlock } from 'cuelume';
+import { play, setEnabled, setTheme, unlock } from 'cuelume';
+
+setTheme('press'); // material: 'default' | 'mech' | 'bubble' | 'press'
 
 let on = true;
 try { on = localStorage.getItem('twist-sound') !== 'off'; } catch (e) {}

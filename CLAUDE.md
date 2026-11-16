@@ -18,7 +18,7 @@ Controls are WASD/arrows, `z` undo, `r` restart, `Esc`/`m` back, `n` mute. Swipe
 - `index.html` shell only. `css/`: `base.css` (tokens + HUD, restyle from here), `board.css`, `pieces.css`, `rooms.css`.
 - `src/engine/engine.js`: pure rules (parseLevel, nxt, flip, step, stepEvents, isWin). No DOM; Node tools import it directly.
 - `src/data/worlds.js` lists worlds in unlock order; one file per world in `src/data/worlds/`. Level: `{w,h,lr,tb,walls:[[r,c]],pads:[[r,c,'x'|'y']],player:[r,c,fx,fy],home:[r,c,fx,fy],blocks:[...],targets:[...]}`.
-- `src/audio/sfx.js`: every sound, by game event, using the `cuelume` npm package (synthesized Web Audio). Retune sounds only here.
+- `src/audio/sfx.js`: every sound, by game event, using the `cuelume` npm package (synthesized Web Audio, "press" theme). Retune sounds only here.
 - `src/state/progress.js`: localStorage (`twist-done2`, `twist-seen`, `twist-sound`). Do not rename keys.
 - `src/ui/`: `app.js` router (hub -> world room -> level), `rooms.js` (hub + world rooms), `level.js` (play), `board.js` (shared board: seams + tiled reflected copies; used by levels AND rooms), `layout.js` (one global cell size so zoom stays consistent), `pieces.js`, `input.js` (keyboard + swipe -> intents), `theme.js`, `banner.js`, `nav.js` (breaks import cycles).
 - Test hooks on `window`: `__enter(w,l)`, `__world(w)`, `__hub()`, `__done()`, `__set(f)`.
