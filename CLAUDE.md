@@ -46,8 +46,12 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 ## Performance rules
 - Reflections: just enough copies to cover the screen (`MAX_PANES` 49), sparse DOM (no nodes for empty cells), no blur / filters / animation inside `.copy`. Move pieces with `transform`, never `left/top`. Avoid per-piece forced reflows. No pop-in: build while hidden (`#stage.building`), reveal via `swap()`.
 
-## Verification (done for the shipped build)
-- Full playthrough through the real UI flow with key presses (title -> hub -> world, auto-advance, unlocks, group gating, challenges): all 36 levels solved, 0 errors. Undo/redo round trip checked via `__level`. Audited at 1440x900, 768x1024, 412x798, 390x844, 360x640, 320x568, 844x390 (landscape pad). Touch audit with synthetic touch pointer events: title Play, D-pad walking hub -> room -> level, Undo/Redo/Reset, Back/Menu, menu rows/toggles/arrows, pause -> level select -> hub -> title, settings persistence. Rotation mid-level preserves state; 2000 random key presses over all worlds: 0 errors, no DOM growth. Median frame ~8 ms (120 Hz), worst < 10 ms. Not done: a physical phone, hearing the sounds.
+## Verification (all run against the final live deployment, https://twist-game.vercel.app)
+- **Full playthrough, fresh state, real key presses:** all 36 levels (28 main + 8 challenge) solved, groups open 4 -> 6 -> 8 -> 10 levels, each finished world unlocks the next, challenges open after the main run and never gate anything, 0 errors.
+- **Touch pass at 390x844 (one uninterrupted run, synthetic touch pointer events): 28/28.** Play, D-pad walking hub -> room -> level, locked-door counts, Undo/Redo/Reset + their greyed states, Back/Menu, menu rows / toggles / arrows, OK-button menu mode, pause -> Level select -> hub -> title, settings persistence.
+- **Desktop pass (one run, keyboard + mouse): 18/18.** No pad, Esc/Tab menus, keyboard menu navigation, locked doors refuse, z/y/r, Level select, Esc chain, mouse Play, no overflow.
+- Also checked: rotation mid-level keeps state; 2000 random key presses across all worlds (0 errors, no DOM growth); layouts at 1440x900, 768x1024, 412x798, 390x844, 360x640, 320x568, 844x390 (landscape pad); median frame ~8 ms, worst < 10 ms.
+- NOT done (cannot be from here): a physical phone, hearing the sounds.
 
 ## Ideas / next
 - More levels per world; a fifth mechanic; hints; level editor; TypeScript for engine + data; sound/music pass (not heard by the author yet).
