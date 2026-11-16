@@ -1,7 +1,5 @@
-// The level title + target dots live in #top, which hugs the top edge of the current board.
+// The target dots live in #top, which hugs the top edge of the current board.
 import { $ } from './dom.js';
-
-export const setTitle = text => { $('chip').textContent = text || ''; };
 
 // Call after a screen is built. Uses layout offsets (not bounding rects) so it is
 // correct even while the stage is mid-transition.

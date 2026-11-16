@@ -28,14 +28,8 @@ export function parseMap(raw) {
   if (!m.start) m.start = m.exit;        // no S: the player starts standing on the back button
   return m;
 }
-// two path cells are visibly joined by a trail segment
-export function joined(m, a, b, rows) {
-  const ch = p => rows[p[0]][p[1]];
-  const ka = a[0] + ',' + a[1], kb = b[0] + ',' + b[1];
-  if (!m.path.has(ka) || !m.path.has(kb)) return false;
-  const x = ch(a), y = ch(b);
-  return x === ',' || y === ',' || x === 'S' || y === 'S';
-}
+// two adjacent path cells (doors, trail, start) are visibly joined by a connector
+export function joined(m, a, b) { return m.path.has(a[0] + ',' + a[1]) && m.path.has(b[0] + ',' + b[1]); }
 // cells the player can stand on (not stone, not a door)
 export function isDoor(m, r, c) {
   return (m.exit && m.exit[0] === r && m.exit[1] === c) || Object.values(m.levels).some(p => p[0] === r && p[1] === c);

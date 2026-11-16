@@ -10,6 +10,11 @@ WORLDS.forEach((w, wi) => {
     if (!r || r.len < 0) fail('UNSOLVABLE', wi, li);
     if (seen.has(k)) fail('DUPLICATE', wi, li); seen.add(k);
   });
+  // groups: every main level in exactly one group, no challenge levels in groups
+  if (w.groups) {
+    const flat = w.groups.flat(), mains = w.levels.map((d, i) => d.challenge ? -1 : i).filter(i => i >= 0);
+    if (flat.length !== new Set(flat).size || mains.some(i => !flat.includes(i)) || flat.some(i => !mains.includes(i))) fail('GROUPS must list each main level exactly once', wi);
+  }
   // room map: every level exactly once, start + exit present, everything reachable on foot
   const m = parseMap(w.map);
   w.levels.forEach((_, li) => { if (!m.levels[li]) fail('MAP missing level', wi, li); });

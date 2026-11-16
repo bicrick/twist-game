@@ -3,7 +3,6 @@ import { $, el } from './dom.js';
 import { createBoard } from './board.js';
 import { piece, orient } from './pieces.js';
 import { theme } from './theme.js';
-import { setTitle } from './hud.js';
 import { setActiveBot, stepBot } from './bot.js';
 import { puff } from './fx.js';
 import { levelCell, LEVEL_MARGIN } from './layout.js';
@@ -12,10 +11,11 @@ import { swap } from './transition.js';
 import { sfx } from '../audio/sfx.js';
 import { WORLDS } from '../data/worlds.js';
 import * as progress from '../state/progress.js';
-import { parseLevel, step, stepEvents, isWin, same } from '../engine/engine.js';
+import { parseLevel, step, stepEvents, isWin, same, openGates } from '../engine/engine.js';
+import { PORTAL_COLORS, ID_COLORS } from './palette.js';
 
 let wi = 0, li = 0, state = null, hist = [], dirs = [], prev = {}, panes = [], CELL = 64;
-let curDir = [0, 0], busy = false, completed = null;
+let curDir = [0, 0], busy = false, completed = null, decor = [], prevOpen;
 
 export const isBusy = () => busy;
 export function start(w, l) {
@@ -25,12 +25,32 @@ export function start(w, l) {
 export const restart = () => { sfx.restart(); swap(() => start(wi, li), { dir: 'fade' }); };
 export const leave = () => { sfx.leave(); nav.world(wi, li); };
 
-function addCells(root, L) {
+// everything on the board that needs an element (empty floor needs none): walls, pads, portals, plates, gates
+function levelDecor(L) {
+  const out = [], pair = new Map();
+  let np = 0;
+  for (const [k, d] of L.portals) {
+    if (pair.has(k)) continue;
+    pair.set(k, np); pair.set(d.r + ',' + d.c, np); np++;
+  }
   for (let r = 0; r < L.H; r++) for (let c = 0; c < L.W; c++) {
-    const wall = L.walls.has(r + ',' + c), pd = L.pads.get(r + ',' + c);
-    if (!wall && !pd) continue;                       // empty floor needs no element
-    const d = el('cell' + (wall ? ' wall' : '') + (pd ? ' pad ' + pd : ''), root);
-    d.style.left = c * CELL + 'px'; d.style.top = r * CELL + 'px';
+    const k = r + ',' + c, e = { r, c, cls: [], pc: null, gid: null };
+    if (L.walls.has(k)) e.cls.push('wall');
+    if (L.pads.has(k)) e.cls.push('pad', L.pads.get(k));
+    if (L.portals.has(k)) { const f = L.portals.get(k).flip; e.cls.push('portal'); if (f) e.cls.push('pf-' + f); e.pc = PORTAL_COLORS[pair.get(k) % PORTAL_COLORS.length]; }
+    const pl = L.plates.find(p => p.r === r && p.c === c);
+    if (pl) { e.cls.push('plate'); e.pc = ID_COLORS[pl.id % ID_COLORS.length]; }
+    if (L.gates.has(k)) { e.cls.push('gate'); e.gid = L.gates.get(k); e.pc = ID_COLORS[e.gid % ID_COLORS.length]; }
+    if (e.cls.length) out.push(e);
+  }
+  return out;
+}
+function addCells(root, gates) {
+  for (const e of decor) {
+    const d = el('cell ' + e.cls.join(' '), root);
+    d.style.left = e.c * CELL + 'px'; d.style.top = e.r * CELL + 'px';
+    if (e.pc) d.style.setProperty('--pc', e.pc);
+    if (e.gid !== null) gates.push({ n: d, id: e.gid });
   }
 }
 function build() {
@@ -39,10 +59,10 @@ function build() {
   const st = $('stage'); st.innerHTML = ''; st.classList.remove('win', 'title-mode');
   st.style.setProperty('--cell', CELL + 'px'); st.style.margin = Math.round(CELL * LEVEL_MARGIN) + 'px';
   const big = Math.round(CELL * .8), small = Math.round(CELL * .88);
-  panes = [];
+  panes = []; decor = levelDecor(L); prevOpen = undefined;
   createBoard(st, { W: L.W, H: L.H, lr: L.lr, tb: L.tb }, CELL, (root, k) => {
-    addCells(root, L);
-    panes.push({ k, big, small, root,
+    const gates = []; addCells(root, gates);
+    panes.push({ k, big, small, root, gates,
       tg: L.targets.map(() => piece('ghost blk', root, big)), home: piece('ghost home', root, small),
       bl: state.blocks.map(() => piece('blk', root, big)), pl: piece('player', root, small) });
   });
@@ -51,10 +71,9 @@ function build() {
   L.targets.forEach(() => dd.appendChild(document.createElement('i')));
   const hd = document.createElement('i'); hd.className = 'home'; dd.appendChild(hd);
   prev = {}; update(true);
-  setTitle(WORLDS[wi].name + ' ' + (li + 1));
 }
 
-const at = (n, x, y) => { n.style.transform = `translate(${x}px, ${y}px)`; };
+const at = (n, x, y, sc = 1) => { n.style.transform = `translate(${x}px, ${y}px)` + (sc === 1 ? '' : ` scale(${sc})`); };
 const snap = (n, x, y) => { n.style.transition = 'none'; at(n, x, y); void n.offsetWidth; n.style.transition = ''; };
 function put(node, key, o, size, mobile) {
   const x = o.c * CELL + (CELL - size) / 2, y = o.r * CELL + (CELL - size) / 2, p = prev[key];
@@ -64,7 +83,13 @@ function put(node, key, o, size, mobile) {
   const jumped = mobile && p && (dr || dc) && !straight;
   node.style.transitionDuration = straight && Math.max(Math.abs(dr), Math.abs(dc)) > 1 ? (.12 + .045 * (Math.max(Math.abs(dr), Math.abs(dc)) - 1)).toFixed(2) + 's' : '';
   if (node.__done) { clearTimeout(node.__t); node.__done(); }
-  if (jumped) {
+  if (jumped && state.L.portals.size) {
+    // portal: shrink away where it was, pop out of the partner
+    const ox = p.c * CELL + (CELL - size) / 2, oy = p.r * CELL + (CELL - size) / 2;
+    at(node, ox, oy, .15); node.style.opacity = 0;
+    node.__done = () => { node.__done = null; node.style.transition = 'none'; at(node, x, y, .15); node.style.opacity = 0; void node.offsetWidth; node.style.transition = ''; at(node, x, y); node.style.opacity = 1; };
+    node.__t = setTimeout(node.__done, 120);
+  } else if (jumped) {
     // slide out through the seam into the reflected pane while a twin slides in from the far side
     const tw = node.tw || (node.tw = piece(node.className.replace('piece ', ''), node.parentNode, size));
     const ox = p.c * CELL + (CELL - size) / 2, oy = p.r * CELL + (CELL - size) / 2, dx = curDir[1] * CELL, dy = curDir[0] * CELL;
@@ -96,6 +121,12 @@ function update() {
   const L = state.L, dots = $('dots').children;
   const tst = L.targets.map(t => status(state.blocks, t)), hst = status([state.player], L.home);
   [...tst, hst].forEach((s, i) => dots[i].classList.toggle('on', s === 'ok'));
+  if (L.gates.size) {
+    const open = openGates(state), sig = open ? [...open].sort().join() : '';
+    for (const p of panes) for (const g of p.gates) g.n.classList.toggle('open', !!(open && open.has(g.id)));
+    if (prevOpen !== undefined && sig !== prevOpen) sfx.gate();
+    prevOpen = sig;
+  }
   for (const p of panes) {
     const main = p.k === 'm';
     L.targets.forEach((t, i) => { put(p.tg[i], p.k + 't' + i, t, p.big, false); ghostState(p.tg[i], tst[i], main); });
@@ -120,7 +151,7 @@ export function move(dr, dc) {
   if (isWin(state)) {
     busy = true; sfx.win();
     const was = progress.worldDone(wi); progress.markDone(wi, li);
-    completed = !was && progress.worldDone(wi) ? wi : null;
+    completed = !was && progress.worldDone(wi) ? wi : null;           // optional challenge levels never complete a world
     $('stage').classList.add('win');
     setTimeout(finish, 1100);
   }
@@ -131,11 +162,12 @@ export function undo() {
 }
 function finish() {
   busy = false;
-  if (completed !== null) {                       // that was the last missing level of the world
+  const levels = WORLDS[wi].levels, next = li + 1;
+  if (completed !== null) {                       // that was the last missing main level of the world
     const w = completed; completed = null; nav.hub(w);
     sfx.unlocked();
-  } else if (li + 1 < WORLDS[wi].levels.length) nav.level(wi, li + 1);   // carry straight on to the next one
-  else nav.world(wi, li);                          // end of the world: back to its room
+  } else if (next < levels.length && !levels[next].challenge && !levels[li].challenge) nav.level(wi, next);   // carry straight on
+  else nav.world(wi, li);                          // end of the main run, or a challenge: back to the room
 }
 export const rebuild = () => build();
 export const debugSet = f => { state = f(state); update(); };

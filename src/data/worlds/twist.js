@@ -1,20 +1,18 @@
-// World: Twist. Level format is documented in CLAUDE.md.
+// World: Twist. Level format is documented in CLAUDE.md. Levels flagged challenge are optional (listed last).
 export default {
   name: "Twist",
   sub: "edges that flip you over",
   icon: '<svg viewBox="0 0 24 24"><path d="M3 7c6 0 12 10 18 10M3 17c6 0 12-10 18-10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>',
-  hue: 215,
-  intro: "Walk off an edge and come back on the other side. Violet seams turn you — and anything you push — over.",
-  // Room map (see ui/rooms.js): . floor  , trail  S start  X back door  0-9a-z level index
+  hue: 268,
+  // level groups (state/progress.js): a group opens when the one before it is solved
+  groups: [[0,1,2,3],[4,5],[6,7],[8,9]],
+  // Room map (see data/roommap.js): . floor  , trail  X back door  0-9a-z level index. Doors sit next to each other; adjacent cells are joined by a connector.
   map: [
-    'X,0,1,2,3..',
-    '........,..',
-    '....4,,,,,6',
-    '....,.....,',
-    '....5.....7',
-    '....,.....,',
-    '....,,,,,,,',
-    '......8.9..',
+    "X0123..",
+    "....,..",
+    "54,,,67",
+    "....,..",
+    "ab,89..",
   ],
   levels: [
   {"w":5,"h":1,"lr":"plain","tb":"none","walls":[],"player":[0,2],"blocks":[[0,1]],"targets":[[0,4]],"home":[0,1]},
@@ -27,5 +25,7 @@ export default {
   {"w":4,"h":4,"lr":"twist","tb":"twist","walls":[[2,0]],"player":[0,1,1,1],"home":[3,2,0,0],"blocks":[[3,0,0,1]],"targets":[[0,3,1,1]]},
   {"w":4,"h":3,"lr":"twist","tb":"twist","walls":[[0,2]],"player":[2,1,0,0],"home":[2,0,1,1],"blocks":[[2,0,1,0],[1,3,1,0]],"targets":[[2,1,1,0],[1,1,0,0]]},
   {"w":4,"h":3,"lr":"twist","tb":"twist","walls":[[0,2]],"player":[2,2,1,1],"home":[1,3,1,1],"blocks":[[1,2,1,1],[0,3,0,1]],"targets":[[2,3,0,0],[2,0,0,0]]},
+  {"w":4,"h":4,"lr":"twist","tb":"twist","walls":[[3,2],[3,0],[1,2]],"player":[3,1,0,0],"home":[2,0,0,0],"blocks":[[0,0,0,0],[0,2,0,0]],"targets":[[3,3,1,1],[2,3,1,1]],"challenge":true},
+  {"w":5,"h":4,"lr":"twist","tb":"twist","walls":[[1,1],[0,1],[2,2],[2,0]],"player":[3,0,0,0],"home":[0,0,0,1],"blocks":[[0,2,0,0],[1,3,0,0]],"targets":[[0,3,1,0],[1,2,1,1]],"challenge":true},
   ],
 };

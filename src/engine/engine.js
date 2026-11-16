@@ -1,15 +1,32 @@
 // Pure game rules. No DOM. Node tools (tools/lib.js) import this file directly.
+function portalMap(list) {
+  const m = new Map();
+  for (const [r1, c1, r2, c2, flip] of list) { m.set(r1 + ',' + c1, { r: r2, c: c2, flip: flip || null }); m.set(r2 + ',' + c2, { r: r1, c: c1, flip: flip || null }); }
+  return m;
+}
+// ids of the gates currently open (a piece is standing on a matching plate)
+export function openGates(s) {
+  const L = s.L; if (!L.plates.length) return null;
+  const ids = new Set();
+  for (const p of L.plates) if ((s.player.r === p.r && s.player.c === p.c) || s.blocks.some(b => b.r === p.r && b.c === p.c)) ids.add(p.id);
+  return ids;
+}
 export function parseLevel(d) {
   const walls = new Set((d.walls || []).map(w => w[0] + ',' + w[1]));
   const o = a => ({ r: a[0], c: a[1], fx: a[2] || 0, fy: a[3] || 0 });
   return {
     L: { W: d.w, H: d.h, walls, lr: d.lr, tb: d.tb, targets: d.targets.map(o), home: o(d.home),
-         pads: new Map((d.pads || []).map(p => [p[0] + ',' + p[1], p[2]])), slide: !!d.slide },
+         pads: new Map((d.pads || []).map(p => [p[0] + ',' + p[1], p[2]])), slide: !!d.slide,
+         // portals: [[r1,c1,r2,c2,flip?]]: stepping on either end puts you out of the other (flip 'x'|'y' mirrors you on the way)
+         portals: portalMap(d.portals || []),
+         // plates/gates: [[r,c,id]]: a gate is open while any piece (player or block) rests on a plate with the same id
+         plates: (d.plates || []).map(p => ({ r: p[0], c: p[1], id: p[2] })),
+         gates: new Map((d.gates || []).map(g => [g[0] + ',' + g[1], g[2]])) },
     player: o(d.player), blocks: d.blocks.map(o)
   };
 }
 // neighbour of (r,c) in direction (dr,dc), through glued edges. tw says which twisted seam was crossed.
-export function nxt(L, r, c, dr, dc) {
+export function nxt(L, r, c, dr, dc, open) {
   let nr = r + dr, nc = c + dc, tw = null;
   if (nc < 0 || nc >= L.W) {
     if (L.lr === 'none') return null;
@@ -20,8 +37,17 @@ export function nxt(L, r, c, dr, dc) {
     nr = (nr + L.H) % L.H;
     if (L.tb === 'twist') { nc = L.W - 1 - nc; tw = 'tb'; }
   }
-  if (L.walls.has(nr + ',' + nc)) return null;
-  return { r: nr, c: nc, tw, pad: L.pads.get(nr + ',' + nc) || null };
+  let key = nr + ',' + nc;
+  if (L.walls.has(key)) return null;
+  const gid = L.gates.get(key);
+  if (gid !== undefined && !(open && open.has(gid))) return null;       // closed gate
+  const wp = L.portals.get(key);
+  if (wp) {                                                              // stepping on a portal: come out of its partner
+    if (wp.r === r && wp.c === c) return null;
+    nr = wp.r; nc = wp.c; key = nr + ',' + nc;
+    return { r: nr, c: nc, tw, pad: wp.flip || L.pads.get(key) || null };
+  }
+  return { r: nr, c: nc, tw, pad: L.pads.get(key) || null };
 }
 // a piece flips when it crosses a twisted seam, and when it enters a mirror pad (x: left-right, y: up-down)
 export function flip(o, tw, pad) {
@@ -34,16 +60,16 @@ export function flip(o, tw, pad) {
 }
 // keys always mean the same direction; only orientation of pieces changes at twisted seams
 export function step(s, dr, dc) {
-  const L = s.L, p = s.player;
-  const n = nxt(L, p.r, p.c, dr, dc);
+  const L = s.L, p = s.player, open = openGates(s);
+  const n = nxt(L, p.r, p.c, dr, dc, open);
   if (!n) return null;
   const at = (r, c) => s.blocks.findIndex(b => b.r === r && b.c === c);
-  if (L.slide) return stepSlide(s, dr, dc, n, at);
+  if (L.slide) return stepSlide(s, dr, dc, n, at, open);
   const moves = [];
   let cur = n, guard = 0;
   while (at(cur.r, cur.c) >= 0) {
     if (++guard > L.W * L.H) return null;
-    const m = nxt(L, cur.r, cur.c, dr, dc);
+    const m = nxt(L, cur.r, cur.c, dr, dc, open);
     if (!m) return null;
     moves.push([at(cur.r, cur.c), m]);
     cur = m;
@@ -55,13 +81,13 @@ export function step(s, dr, dc) {
 }
 // Slide levels: a pushed block keeps going until something stops it (wall, solid border, another block,
 // or the player). It flips on twisted seams as it passes them. Blocks never push each other.
-function stepSlide(s, dr, dc, n, at) {
+function stepSlide(s, dr, dc, n, at, open) {
   const L = s.L, p = s.player, bi = at(n.r, n.c);
   const player = { ...flip(p, n.tw, n.pad), r: n.r, c: n.c };
   if (bi < 0) return { ...s, player };
   let cur = n, cb = { ...s.blocks[bi] }, steps = 0;
   for (;;) {
-    const m = nxt(L, cur.r, cur.c, dr, dc);
+    const m = nxt(L, cur.r, cur.c, dr, dc, open);
     if (!m || (m.r === n.r && m.c === n.c)) break;
     const o = at(m.r, m.c); if (o >= 0 && o !== bi) break;
     cb = { ...flip(cb, m.tw, m.pad), r: m.r, c: m.c }; cur = m;

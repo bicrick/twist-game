@@ -13,6 +13,6 @@ const fit = (W, H) => { const [w, h] = screenSize(); return Math.floor(Math.min(
 export const baseCell = () => Math.max(MIN, Math.min(MAX, fit(maxW + LEVEL_PAD, maxH + LEVEL_PAD)));
 export const levelCell = baseCell;
 // rooms leave a margin so the reflections around them are visible (less of it on small screens)
-const roomFit = (W, H) => { const [w, h] = screenSize(), k = w < 700 ? .94 : .8; return Math.floor(Math.min(w * k / W, (h - 110) * k / H)); };
+const roomFit = (W, H) => { const [w, h] = screenSize(), k = w < 700 ? .94 : .92; return Math.floor(Math.min(w * k / W, (h - 110) * k / H)); };
 export const roomCell = (W, H) => Math.max(MIN, Math.min(baseCell(), roomFit(W, H)));
 export const LEVEL_MARGIN = .3;

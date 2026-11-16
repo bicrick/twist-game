@@ -5,12 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#eef0f3">
 <title>Twist</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="Twist: a puzzle game about glued, twisted and solid edges.">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/board.css">
 <link rel="stylesheet" href="css/pieces.css">
 <link rel="stylesheet" href="css/rooms.css">
 <link rel="stylesheet" href="css/controls.css">
 <link rel="stylesheet" href="css/title.css">
+<link rel="stylesheet" href="css/menu.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -19,11 +26,16 @@
     <stop offset=".55" style="stop-color: var(--player)"/>
     <stop offset="1" style="stop-color: color-mix(in srgb, var(--player) 80%, #000)"/>
   </radialGradient>
-  <path id="cloudShape"/>
+  <radialGradient id="blkGrad" cx=".5" cy=".4" r=".68">
+    <stop offset="0" style="stop-color: color-mix(in srgb, var(--block) 60%, #fff)"/>
+    <stop offset=".55" style="stop-color: var(--block)"/>
+    <stop offset="1" style="stop-color: color-mix(in srgb, var(--block) 78%, #000)"/>
+  </radialGradient>
+  <path id="cloudShape"/><path id="pebbleShape"/>
 </defs></svg>
 <div id="device">
   <div id="screen">
-    <div id="top"><div id="bar"><span id="chip"></span><div id="dots"></div></div></div>
+    <div id="top"><div id="bar"><div id="dots"></div></div></div>
     <div id="stage"></div>
   </div>
   <div id="pad"></div>

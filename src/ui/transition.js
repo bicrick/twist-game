@@ -6,6 +6,7 @@
 //   first      initial load: only the fade-in
 import { $ } from './dom.js';
 import { placeTop } from './hud.js';
+import * as settings from '../state/settings.js';
 
 const OUT = { in: 220, out: 200, fade: 110 }, IN = { in: 320, out: 300, fade: 170 };
 let busy = false, pending = null, idle = [];
@@ -16,6 +17,7 @@ export const whenIdle = fn => { if (busy) idle.push(fn); else fn(); };
 export function swap(build, { dir = 'fade', origin = null, first = false } = {}) {
   if (busy) { pending = [build, { dir: 'fade' }]; return; }
   busy = true;
+  if (settings.get('reduceMotion')) dir = 'fade';      // no zooms when motion is reduced
   const st = $('stage'), scr = $('screen');
   const outScale = { in: 1.4, out: .8, fade: .985 }[dir], inScale = { in: .78, out: 1.3, fade: 1.015 }[dir];
 

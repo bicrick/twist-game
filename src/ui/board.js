@@ -22,18 +22,20 @@ function rims(root, spec, cell) {
  * for things that exist (no empty-cell elements), so tiling the screen with reflections stays cheap.
  * key is 'm' for the real board. Returns the floor element.
  */
-export function createBoard(stage, spec, cell, fillPane) {
+export function createBoard(stage, spec, cell, fillPane, opts = {}) {
   const { W: cw, H: ch, lr, tb } = spec;
   const bw = cw * cell, bh = ch * cell, [sw, sh] = screenSize();
   const floor = el('', stage); floor.id = 'floor';
+  if (opts.flat) floor.classList.add('room');          // menu rooms: a plain rounded card, no reflections
   floor.style.width = bw + 'px'; floor.style.height = bh + 'px';
   // exactly enough rings of copies to cover the screen
-  let nI = lr === 'none' ? 0 : Math.ceil((sw / 2 - bw / 2) / bw);
-  let nJ = tb === 'none' ? 0 : Math.ceil((sh / 2 - bh / 2) / bh);
+  let nI = opts.flat || lr === 'none' ? 0 : Math.ceil((sw / 2 - bw / 2) / bw);
+  let nJ = opts.flat || tb === 'none' ? 0 : Math.ceil((sh / 2 - bh / 2) / bh);
   nI = Math.max(0, nI); nJ = Math.max(0, nJ);
   while ((2 * nI + 1) * (2 * nJ + 1) > MAX_PANES && (nI > 1 || nJ > 1)) { if (nI >= nJ) nI--; else nJ--; }
-  fillPane(floor, 'm'); rims(floor, spec, cell);
-  floor.dataset.rimTop = tb === 'none' ? Math.round(cell * .22) : 0;
+  fillPane(floor, 'm');
+  if (!opts.flat) rims(floor, spec, cell);
+  floor.dataset.rimTop = !opts.flat && tb === 'none' ? Math.round(cell * .22) : 0;
   for (let i = -nI; i <= nI; i++) for (let j = -nJ; j <= nJ; j++) {
     if (!i && !j) continue;
     const d = Math.max(Math.abs(i), Math.abs(j));

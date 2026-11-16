@@ -1,11 +1,12 @@
 /* The board: floor, walls, pads, seams, reflected copies. Shared by levels and rooms. */
 /* boards are SQUARE-edged: a glued world tiles edge to edge with its reflections. Solid edges get a wall rim instead. */
-#floor { position: relative; background: var(--floor); box-shadow: 0 0 0 1px color-mix(in srgb, var(--wall-shade) 14%, transparent); transition: background .5s ease; }
+#floor { position: relative; background: var(--floor); box-shadow: 0 0 0 2px var(--frame); transition: background .5s ease; }
 .copy { position: absolute; z-index: 1; background: var(--floor); transition: background .5s ease; contain: layout style; }
 .cell { position: absolute; width: var(--cell); height: var(--cell); }
 /* walls: bright clay stones with a darker underside */
-.cell.wall::before { content: ''; position: absolute; inset: 3%; background: var(--wall); border-radius: 36%;
-  box-shadow: inset 0 calc(var(--cell) * -.12) 0 var(--wall-shade); }
+/* walls: bright clay stones: darker underside + a soft top highlight (the Parabox bevel, in clay) */
+.cell.wall::before { content: ''; position: absolute; inset: 3%; background: var(--wall); border-radius: 34%;
+  box-shadow: inset 0 calc(var(--cell) * -.13) 0 var(--wall-shade), inset 0 calc(var(--cell) * .05) 0 rgba(255,255,255,.3); }
 .cell.pad::after { content: ''; position: absolute; inset: 14%; background: color-mix(in srgb, var(--padc) 16%, transparent);
   border: var(--b) solid var(--padc); border-radius: 28%; display: flex; align-items: center; justify-content: center;
   font: 800 calc(var(--cell) * .4)/1 var(--font); color: var(--padc); }
@@ -16,3 +17,16 @@
 /* solid borders: a clay wall rim just outside the board edge. Square-ended on purpose: it must run straight
    through the reflections with no notches where copies meet. */
 .rim { position: absolute; z-index: 6; background: var(--wall); pointer-events: none; }
+
+/* portals: a ring in the pair's colour (flip portals add a mirror arrow) */
+.cell.portal::before { content: ''; position: absolute; inset: 15%; border-radius: 50%; border: calc(var(--cell) * .07) solid var(--pc); box-shadow: inset 0 0 0 calc(var(--cell) * .06) color-mix(in srgb, var(--pc) 25%, transparent); }
+.cell.portal::after { content: ''; position: absolute; inset: 36%; border-radius: 50%; background: var(--pc); opacity: .55; display: flex; align-items: center; justify-content: center; }
+.cell.portal.pf-x::after, .cell.portal.pf-y::after { inset: 24%; background: none; opacity: 1; color: var(--pc); font: 800 calc(var(--cell) * .34)/1 var(--font); display: flex; }
+.cell.portal.pf-x::after { content: '\2194'; } .cell.portal.pf-y::after { content: '\2195'; }
+/* plates: a pressable square; gates: a slab that fades away while its plate is held down */
+.cell.plate::before { content: ''; position: absolute; inset: 20%; border-radius: 28%; background: color-mix(in srgb, var(--pc) 22%, transparent); border: calc(var(--cell) * .06) solid var(--pc); }
+.cell.gate::before { content: ''; position: absolute; inset: 4%; border-radius: 26%; background: var(--pc); box-shadow: inset 0 calc(var(--cell) * -.1) 0 rgba(0,0,0,.25), inset 0 calc(var(--cell) * .05) 0 rgba(255,255,255,.3); transition: opacity .18s ease, transform .18s ease; }
+.cell.gate.open::before { opacity: .16; transform: scale(.55); }
+
+/* menu rooms: the same framed square box as a level (no reflections) */
+#floor.room { box-shadow: 0 0 0 2px var(--frame); }

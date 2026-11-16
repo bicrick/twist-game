@@ -1,7 +1,7 @@
 // Keyboard + touch (swipe) input -> intents. Keys never invert.
 const DIRS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1], w: [-1, 0], s: [1, 0], a: [0, -1], d: [0, 1] };
 
-// handlers: { dir(dr,dc), undo(), restart(), back(), mute(), confirm(), gesture() }
+// handlers: { dir(dr,dc), undo(), restart(), back(), menu(), mute(), confirm(), gesture() }
 export function bindInput(h) {
   document.addEventListener('keydown', e => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -11,7 +11,8 @@ export function bindInput(h) {
     else if (k === 'Enter' || k === ' ') { e.preventDefault(); h.confirm(); }
     else if (k === 'z') h.undo();
     else if (k === 'r') h.restart();
-    else if (k === 'Escape' || k === 'm') h.back();
+    else if (k === 'Escape') h.back();
+    else if (k === 'Tab' || k === 'p') { e.preventDefault(); h.menu(); }
     else if (k === 'n') h.mute();
   });
   // swipe anywhere on the screen = move (off when the on-screen pad is showing). A tap does nothing.

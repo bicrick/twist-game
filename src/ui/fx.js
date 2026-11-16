@@ -1,8 +1,10 @@
 // Little squircle puffs the bot leaves behind. DOM-light: a few absolutely positioned dots that
 // remove themselves; capped so mashing keys can never pile them up.
 import { el } from './dom.js';
+import * as settings from '../state/settings.js';
 let live = 0;
 export function puff(root, x, y, size, dr, dc) {
+  if (!settings.get('trail') || settings.get('reduceMotion')) return;
   for (let i = 0; i < 3 && live < 30; i++) {
     const s = size * (.12 + Math.random() * .1), p = el('puff', root); live++;
     p.style.width = p.style.height = s + 'px';

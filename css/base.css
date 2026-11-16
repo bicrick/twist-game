@@ -1,13 +1,14 @@
 /* Theme tokens: restyle the whole game from here. Per-world colours are set at runtime (ui/theme.js). */
 :root {
-  /* DESIGN TOKENS. Look (inspired by the Grok Bot app): light, airy, white cards on soft tinted backgrounds,
-     vivid clay-coloured walls per world, pink cloud bot with white eyes, squircles everywhere, soft shadows,
-     no hard outlines. Per-world colours come from ui/theme.js. */
-  --bg: #eef0f3; --floor: #fbfcfd; --wall: #2f7bff; --wall-shade: #1d58c9; --trail: #e3e8ef;
-  --player: #ff4f9a; --block: #ff9a35; --home: var(--player); --okc: #1fc46b;
-  --plain: #19b88a; --twist: #f59e0b; --padc: #8a5cf5;
-  --ink: #1d1d1f; --ink-soft: #7c7c84;
+  /* DESIGN TOKENS. The look is Parabox x Grok bot: dark, saturated, framed boxes with bright bevelled walls
+     (Parabox) populated by soft clay squircle bots (Grok). World colours come from ui/theme.js. */
+  --bg: #06090c; --floor: #0f1b24; --wall: #3b8fe0; --wall-shade: #26629e; --trail: #223644; --frame: rgba(255,255,255,.9);
+  --player: #2f7bff; --block: #ff9a35; --home: var(--player); --okc: #3ddc84;
+  --plain: #19b88a; --twist: #f5b400; --padc: #8a5cf5;
+  --card: #15212b; --card-2: #1f2f3c;
+  --ink: #f1f5f8; --ink-soft: rgba(241,245,248,.55);
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'DIN Condensed', 'Bahnschrift', 'Roboto Condensed', 'Arial Narrow', Impact, sans-serif;
   --r-ui: 10px;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -16,14 +17,12 @@ body { background: var(--bg); transition: background .5s ease; font-family: var(
        overflow: hidden; user-select: none; touch-action: none; overscroll-behavior: none; }
 /* #device holds the game screen (and, on touch screens, the pad: see controls.css) */
 #device { position: fixed; inset: 0; }
-#screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+#screen { position: absolute; inset: 0; background: var(--bg); transition: background .5s ease; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 #stage { position: relative; --b: calc(var(--cell) * .04); }
 
 /* HUD: sits just above the top edge of the current board (positioned by ui/hud.js) */
 #top { position: absolute; z-index: 30; pointer-events: none; transform: translateY(-100%); padding-bottom: 10px; }
-#bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 16px; }
-#chip { font: 600 14px/1 var(--font); color: var(--ink-soft); background: rgba(255,255,255,.85); padding: 6px 11px; margin-left: -2px; border-radius: 11px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
-#chip:empty { display: none; }
+#bar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-height: 16px; }
 #dots { display: flex; gap: 7px; }
 #dots i { width: 12px; height: 12px; border-radius: 38%; border: 2.5px solid var(--block); background: transparent; transition: background .2s ease; }
 #dots i.home { border-color: var(--home); }
@@ -34,3 +33,10 @@ body { background: var(--bg); transition: background .5s ease; font-family: var(
 #bar { transition: opacity .2s ease; }
 #screen.fading #bar { opacity: 0; }
 #stage.building *, #stage.building *::after { transition: none !important; animation: none !important; }
+
+/* background particles (behind the board; hidden on the title, which has its own) */
+#stage { z-index: 1; }
+#particles { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+#particles .pt { position: absolute; top: 100%; border-radius: 26%; background: color-mix(in srgb, var(--wall) 20%, transparent); animation: ptRise 60s linear infinite; }
+@keyframes ptRise { to { transform: translateY(-120vh) rotate(30deg); } }
+#stage.title-mode ~ #particles, html.reduce-motion #particles { display: none; }

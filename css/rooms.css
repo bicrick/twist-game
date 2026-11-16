@@ -1,21 +1,25 @@
 /* Menu rooms: the hub (worlds) and a world room (levels). Doors are little boxes. */
 .door { position: absolute; z-index: 4; display: flex; align-items: center; justify-content: center; color: #fff;
-        border-radius: 28%; box-shadow: 0 calc(var(--cell) * .05) 0 rgba(0,0,0,.35); overflow: hidden; }
+        border-radius: 28%; box-shadow: 0 calc(var(--cell) * .05) 0 rgba(0,0,0,.45); overflow: hidden; }
 .door .num { position: absolute; left: 8%; top: 5%; z-index: 3; font: 700 calc(var(--cell) * .19)/1 var(--font); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
 .door .tick { position: absolute; right: 6%; top: 6%; width: 24%; height: 24%; background: var(--okc); color: #052b14; border-radius: 34%;
               font: 800 calc(var(--cell) * .16)/1 var(--font); display: flex; align-items: center; justify-content: center; z-index: 3; }
-.door.exit { background: #fff; }
-.door.exit .icon { width: 56%; height: 56%; color: var(--ink-soft); }
-.door.locked { background: #d9dde3 !important; }
+.door.exit { background: var(--card-2); }
+.door.exit .icon { width: 56%; height: 56%; color: var(--ink); }
+.door.locked { background: #202c36 !important; box-shadow: 0 calc(var(--cell) * .05) 0 rgba(0,0,0,.4); }
 .door.bump { animation: bump .25s ease; }
 @keyframes bump { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 .door .glyph { position: absolute; left: 27%; top: 9%; width: 46%; height: 46%; color: #fff; }
 .door .pips { position: absolute; left: 8%; right: 8%; bottom: 10%; display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; }
 .door .pips i { width: calc(var(--cell) * .09); height: calc(var(--cell) * .09); border-radius: 40%; background: rgba(255,255,255,.4); }
 .door .pips i.on { background: #fff; }
-.door .lock { position: absolute; left: 50%; top: 50%; width: 38%; height: 38%; transform: translate(-50%, -50%); color: #9aa1ad; }
-.mini { background-size: 100% 100%; border-radius: 14%; box-shadow: 0 0 0 calc(var(--b) * .5) rgba(255,255,255,.7); }
+.door .lock { position: absolute; left: 50%; top: 50%; width: 38%; height: 38%; transform: translate(-50%, -50%); color: #5a6b79; }
+.mini { background-size: 100% 100%; border-radius: 14%; box-shadow: 0 0 0 calc(var(--b) * .6) rgba(255,255,255,.8); }
 
 /* world-room map */
 .trails { position: absolute; left: 0; top: 0; pointer-events: none; }
 .trails path { fill: none; stroke: var(--trail); stroke-linecap: round; stroke-linejoin: round; }
+
+/* optional challenge levels: a golden ring and star */
+.door.challenge { box-shadow: 0 0 0 calc(var(--cell) * .05) #f5b400, 0 calc(var(--cell) * .05) 0 rgba(0,0,0,.35); }
+.door.challenge .num { color: #fff3c4; font-size: calc(var(--cell) * .24); }

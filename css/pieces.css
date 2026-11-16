@@ -28,32 +28,32 @@
 .piece.ghost.home.ok { --c: var(--okc); opacity: 1; }
 .piece.ghost.home.ok .cb { fill: color-mix(in srgb, var(--okc) 28%, transparent); }
 
-/* ---- blocks (carrots) ---- */
-.piece.blk { --c: var(--block); filter: drop-shadow(0 calc(var(--cell) * .045) calc(var(--cell) * .03) rgba(0,0,0,.35)); }
-.piece.blk .face { display: flex; align-items: center; justify-content: center; }
-.piece.blk .face svg { width: 100%; height: 100%; padding: 2%; overflow: visible; }
-.bb { fill: var(--block); stroke: #e0701a; stroke-width: 2.5; stroke-linejoin: round; }
-.bs { fill: #2fbf5a; stroke: #1f9a43; stroke-width: 2; stroke-linejoin: round; }
-.bh { fill: rgba(255,255,255,.32); }
-.br { fill: none; stroke: #e0701a; stroke-width: 3; stroke-linecap: round; opacity: .7; }
-/* goal carrot: outline only */
-.piece.ghost.blk { filter: none; z-index: 2; }
-.piece.ghost.blk .bb { fill: color-mix(in srgb, var(--block) 14%, transparent); stroke: var(--block); stroke-width: 3.5; }
-.piece.ghost.blk .bs { fill: color-mix(in srgb, #2fbf5a 18%, transparent); stroke: #2fbf5a; stroke-width: 3; }
-.piece.ghost.blk .bh, .piece.ghost.blk .br { display: none; }
-.piece.ghost.blk.ok .bb { fill: color-mix(in srgb, var(--okc) 36%, transparent); stroke: var(--okc); }
-.piece.ghost.blk.ok .bs { stroke: var(--okc); }
+/* ---- blocks: little pebble bots ---- */
+.cb.pb { fill: url(#blkGrad); }
+.piece.blk { --c: var(--block); filter: drop-shadow(0 calc(var(--cell) * .05) calc(var(--cell) * .035) rgba(0,0,0,.45)); }
+.piece.blk .eye.l { left: 34%; top: 47%; --rot: -8deg; } .piece.blk .eye.r { left: 56%; top: 42%; --rot: -12deg; }
+.piece.blk .eye { height: 19%; }
+/* a block's goal: just its outline */
+.piece.ghost.blk { --c: var(--block); filter: none; opacity: .7; }
+.piece.ghost.blk .cb { fill: color-mix(in srgb, var(--c) 10%, transparent); stroke: var(--c); stroke-width: 3.5; stroke-linejoin: round; }
+.piece.ghost.blk .eye { background: var(--c); animation: none; transform: rotate(var(--rot)); }
+.piece.ghost.blk.ok { --c: var(--okc); opacity: 1; }
+.piece.ghost.blk.ok .cb { fill: color-mix(in srgb, var(--okc) 28%, transparent); }
 .piece.ghost { z-index: 2; }
-.piece.ghost.pinging::after { content: ''; position: absolute; inset: -3px; border: var(--b) solid var(--okc); border-radius: 34%; animation: ping .5s ease-out forwards; pointer-events: none; }
+.piece.ghost.pinging::after { content: ''; position: absolute; inset: -3px; border: var(--b) solid var(--okc); border-radius: 42%; animation: ping .5s ease-out forwards; pointer-events: none; }
 @keyframes ping { from { transform: scale(1); opacity: .9; } to { transform: scale(1.5); opacity: 0; } }
 @keyframes pulse { 0% { transform: scale(1); } 40% { transform: scale(1.03); } 100% { transform: scale(1); } }
 .win #floor { animation: pulse .5s ease; }
 
 /* puffs the bot leaves behind */
-.puff { position: absolute; z-index: 4; background: var(--player); border-radius: 34%; opacity: .4; pointer-events: none; animation: puff .55s ease-out forwards; }
+.puff { position: absolute; z-index: 4; background: var(--player); border-radius: 34%; opacity: .45; pointer-events: none; animation: puff .55s ease-out forwards; }
 @keyframes puff { to { transform: translate(var(--dx), var(--dy)) scale(.25); opacity: 0; } }
 
 /* reflections are decoration: keep them cheap (no filters, no animation) */
 .copy .piece.player, .copy .piece.blk { filter: none; }
 .copy .eye { animation: none; transform: rotate(var(--rot)); }
 .copy .puff { display: none; }
+
+/* Reduce motion setting (also the OS preference by default): no hop, no puffs, no drifting, no blink */
+html.reduce-motion .bot-sq.hop, html.reduce-motion .eye, html.reduce-motion .fbot, html.reduce-motion .go { animation: none !important; }
+html.reduce-motion .piece, html.reduce-motion .face, html.reduce-motion .gaze { transition-duration: .01s !important; }

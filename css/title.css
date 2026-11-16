@@ -1,23 +1,23 @@
 /* Title screen */
 #stage.title-mode { position: absolute; inset: 0; }
-.title { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
-.hero { position: relative; width: 104px; height: 104px; margin-bottom: 6px; }
-.word { font: 800 clamp(60px, 13vw, 124px)/1 var(--font); letter-spacing: -.04em; color: var(--ink); }
-.tag { font: 500 17px/1.2 var(--font); color: var(--ink-soft); }
-.go { margin-top: 18px; padding: 13px 26px; border-radius: 18px; background: var(--ink); color: #fff; font: 600 18px/1 var(--font);
-      box-shadow: 0 3px 0 rgba(0,0,0,.25); display: flex; gap: 10px; align-items: center; animation: nudge 2.4s ease-in-out infinite; }
-.go kbd, .keys kbd { font: 600 12px/1 var(--font); padding: 3px 7px; border-radius: 7px; background: rgba(255,255,255,.2); }
-.keys kbd { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.15); margin-left: 4px; }
-.keys { position: absolute; bottom: 20px; left: 0; right: 0; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; font: 500 13px/1 var(--font); color: var(--ink-soft); }
-.count { position: absolute; left: 22px; bottom: 56px; font: 600 14px/1 var(--font); color: var(--ink-soft); }
-html.with-pad .keys { display: none; } html.with-pad .count { bottom: 20px; }
-@keyframes nudge { 50% { transform: translateY(-3px); } }
-/* drifting bots */
-.fbot { position: absolute; opacity: .92; animation: float 10s ease-in-out infinite alternate; filter: drop-shadow(0 6px 8px rgba(0,0,0,.12)); }
+.title { position: absolute; inset: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+.word { position: relative; z-index: 2; display: flex; align-items: flex-end; gap: calc(var(--T) * .05); font: 700 var(--T)/.82 var(--font-display); letter-spacing: .01em; color: #fff; text-transform: uppercase; margin-top: -4vh; }
+.ibox { position: relative; flex: none; width: calc(var(--T) * .78); height: calc(var(--T) * .78); border: calc(var(--T) * .05) solid #fff; background: hsl(215 55% 14%); }
+.keys { position: absolute; z-index: 2; bottom: 9vh; left: 0; right: 0; display: flex; justify-content: center; gap: clamp(36px, 9vw, 120px); }
+.kgrp { display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
+.kcol { display: flex; flex-direction: column; gap: 4px; }
+.kc { padding: 3px 12px; border: 2px solid #fff; color: #fff; font: 600 13px/1.1 var(--font); text-align: center; }
+.kc.big { padding: 12px 14px; font-size: 18px; }
+.klab { color: #fff; font: 600 clamp(16px, 2.2vw, 22px)/1 var(--font); }
+.count { position: absolute; z-index: 2; left: 22px; bottom: 18px; font: 600 14px/1 var(--font); color: var(--ink-soft); }
+html.with-pad .keys .kcol { display: none; } html.with-pad .keys { bottom: 6vh; }
+/* drifting squares (Parabox) + a small crowd of bots (Grok) */
+.sq { position: absolute; background: rgba(255,255,255,.17); border-radius: 22%; animation: rise 50s linear infinite; pointer-events: none; }
+@keyframes rise { to { transform: translateY(-125vh) rotate(25deg); } }
+.fbot { position: absolute; z-index: 1; opacity: .95; animation: float 10s ease-in-out infinite alternate; filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); pointer-events: none; }
 @keyframes float { from { transform: translate(-10px, 8px) rotate(-4deg); } to { transform: translate(12px, -12px) rotate(5deg); } }
 .bot-body.tint { background: radial-gradient(circle farthest-corner at 24% 17%, color-mix(in srgb, var(--bc) 55%, #fff) 0%, var(--bc) 38%, color-mix(in srgb, var(--bc) 78%, #000) 100%); }
-
-/* bot shapes + faces for the drifting crowd (the player bot is always the charcoal squircle) */
+/* bot shapes + faces for the drifting crowd (the player bot is always the blue cloud) */
 .fbot.s-circle .bot-body { border-radius: 50%; }
 .fbot.s-pebble .bot-body { border-radius: 62% 38% 56% 44% / 50% 58% 42% 50%; }
 .fbot.s-capsule .bot-body { border-radius: 50%; }
@@ -29,4 +29,3 @@ html.with-pad .keys { display: none; } html.with-pad .count { bottom: 20px; }
 .fbot.f-happy .eye { height: 11%; width: 12%; border-radius: 99px 99px 0 0; animation: none; }
 .fbot.f-wide .eye { width: 14%; height: 14%; border-radius: 50%; }
 .fbot.f-surprised .eye { width: 15%; height: 15%; border-radius: 50%; }
-.fbot.f-neutral .eye { }

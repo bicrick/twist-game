@@ -18,3 +18,13 @@ export function cloudPath() {
   }
   return 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L') + 'Z';
 }
+
+// Blocks are little pebble bots: a lopsided blob (bulges differ all round), so a flipped block is visibly flipped.
+export function pebblePath() {
+  const pts = [], cx = 50, cy = 54;
+  for (let i = 0; i < 120; i++) {
+    const a = i / 120 * Math.PI * 2, r = 36 + 4.5 * Math.cos(a - .7) + 3.8 * Math.cos(2 * a + .9) + 2.6 * Math.cos(3 * a - .4);
+    pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+  }
+  return 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L') + 'Z';
+}

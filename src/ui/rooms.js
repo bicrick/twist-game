@@ -4,7 +4,6 @@ import { $, el, LOCK_SVG, BACK_SVG, svgIcon } from './dom.js';
 import { createBoard } from './board.js';
 import { piece, orient } from './pieces.js';
 import { theme } from './theme.js';
-import { setTitle } from './hud.js';
 import { roomCell } from './layout.js';
 import { nav } from './nav.js';
 import { sfx } from '../audio/sfx.js';
@@ -15,7 +14,6 @@ import { setActiveBot, stepBot } from './bot.js';
 import { puff } from './fx.js';
 import * as progress from '../state/progress.js';
 
-const DECOR = { lr: 'twist', tb: 'twist' }; // decorative: copies mirror like a twisted level
 let room = null, pos = [0, 0], players = [], cell = 64;
 
 // the trails of a map as ONE svg path (one node per pane, however long the paths are)
@@ -23,8 +21,8 @@ function trailSvg(mp, spec) {
   if (!mp.d) {
     const c = n => (n + .5) * cell, segs = [];
     for (let r = 0; r < spec.H; r++) for (let q = 0; q < spec.W; q++) {
-      if (q + 1 < spec.W && joined(mp.m, [r, q], [r, q + 1], mp.rows)) segs.push(`M${c(q)} ${c(r)}L${c(q + 1)} ${c(r)}`);
-      if (r + 1 < spec.H && joined(mp.m, [r, q], [r + 1, q], mp.rows)) segs.push(`M${c(q)} ${c(r)}L${c(q)} ${c(r + 1)}`);
+      if (q + 1 < spec.W && joined(mp.m, [r, q], [r, q + 1])) segs.push(`M${c(q)} ${c(r)}L${c(q + 1)} ${c(r)}`);
+      if (r + 1 < spec.H && joined(mp.m, [r, q], [r + 1, q])) segs.push(`M${c(q)} ${c(r)}L${c(q)} ${c(r + 1)}`);
     }
     mp.d = segs.join('');
   }
@@ -42,15 +40,15 @@ function addContent(root, spec) {
   }
 }
 
-// spec: { W, H, hue, doors:[{r,c,cls,color,fill(node,size),act(origin)}], map?, chip }
+// spec: { W, H, hue, doors:[{r,c,cls,color,fill(node,size),act(origin)}], map? }
 function build(spec) {
   room = spec; theme(spec.hue);
   cell = roomCell(spec.W, spec.H);
   const st = $('stage'); st.innerHTML = ''; st.classList.remove('win', 'title-mode'); st.style.margin = '';
   st.style.setProperty('--cell', cell + 'px');
-  const size = Math.round(cell * .86), off = (cell - size) / 2;
+  const size = Math.round(cell * .76), off = (cell - size) / 2;
   players = [];
-  createBoard(st, { W: spec.W, H: spec.H, ...DECOR }, cell, (root) => {
+  createBoard(st, { W: spec.W, H: spec.H, lr: 'none', tb: 'none' }, cell, (root) => {
     addContent(root, spec);
     spec.doors.forEach(d => {
       const b = el('door' + (d.cls ? ' ' + d.cls : ''), root);
@@ -63,25 +61,30 @@ function build(spec) {
     const p = piece("player", root, Math.round(cell * .8)); orient(p, { fx: 0, fy: 0 });
     p.style.transition = 'left .1s ease, top .1s ease';
     players.push(p);
-  });
+  }, { flat: true });
   place(); setActiveBot(players[0], Math.round(cell * .8));
-  $('dots').innerHTML = ''; setTitle(spec.chip);
+  $('dots').innerHTML = '';
 }
 function place() { players.forEach(p => { p.style.left = pos[1] * cell + cell * .12 + 'px'; p.style.top = pos[0] * cell + cell * .12 + 'px'; }); }
 const bump = d => d.nodes.forEach(n => { n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); });
 
+// The hub is a 2-column grid of world doors inside a one-cell margin; you walk around the ring of free cells.
+const HUB_COLS = 2;
 export function showHub(from) {
-  pos = from == null ? [2, 2] : [2, 1 + 2 * from];
+  const n = WORLDS.length, rows = Math.ceil(n / HUB_COLS), H = rows + 2, W = HUB_COLS + 2;
+  const spot = i => [1 + Math.floor(i / HUB_COLS), 1 + (i % HUB_COLS)];
+  // start on the bottom edge; coming back, stand beside the door you left (left or right margin)
+  pos = from == null ? [H - 1, 1] : [spot(from)[0], (from % HUB_COLS) ? W - 1 : 0];
   const doors = WORLDS.map((w, i) => {
-    const open = progress.worldOpen(i);
+    const open = progress.worldOpen(i), [r, c] = spot(i);
     return {
-      r: 1, c: 1 + 2 * i, cls: open ? '' : 'locked', color: `hsl(${w.hue} 85% 56%)`,
+      r, c, cls: open ? '' : 'locked', color: `hsl(${w.hue} 85% 56%)`,
       fill(b) {
         b.title = w.name; b.setAttribute('aria-label', w.name);
         if (!open) { b.appendChild(svgIcon(LOCK_SVG, 'lock')); return; }
         b.appendChild(svgIcon(w.icon, 'glyph'));
-        const pips = el('pips', b), n = progress.worldCount(i);
-        w.levels.forEach((_, l) => { const p = document.createElement('i'); if (l < n) p.className = 'on'; pips.appendChild(p); });
+        const pips = el('pips', b), cnt = progress.worldCount(i), tot = progress.mainTotal(i);
+        for (let l = 0; l < tot; l++) { const p = document.createElement('i'); if (l < cnt) p.className = 'on'; pips.appendChild(p); }
       },
       act(o) {
         if (open) { sfx.enterWorld(); nav.world(i, null, o); }
@@ -89,22 +92,28 @@ export function showHub(from) {
       },
     };
   });
-  build({ W: 2 * WORLDS.length + 1, H: 3, hue: null, doors, chip: '' });
+  room = null;
+  build({ W, H, hue: null, doors });
   room.mode = 'hub';
 }
 
 export function showWorld(w, from) {
   const def = WORLDS[w], m = parseMap(def.map);
   pos = [...(from == null ? m.start : standNextTo(m, m.levels[from]))];
-  const doors = def.levels.map((d, l) => ({
-    r: m.levels[l][0], c: m.levels[l][1], color: `hsl(${def.hue} 85% 56%)`,
-    fill(b, size) {
-      const p = previewURL(d, size);
-      const mini = el('mini', b); mini.style.cssText = `width:${p.w}px;height:${p.h}px;background-image:url(${p.url})`;
-      el('num', b).textContent = l + 1; if (progress.isDone(w, l)) el('tick', b).textContent = '✓';
-    },
-    act(o) { sfx.enterLevel(); nav.level(w, l, o); },
-  }));
+  const doors = def.levels.map((d, l) => {
+    const open = progress.levelOpen(w, l);
+    return {
+      r: m.levels[l][0], c: m.levels[l][1], color: `hsl(${def.hue} 85% 56%)`, cls: (open ? '' : 'locked') + (d.challenge ? ' challenge' : ''),
+      fill(b, size) {
+        if (!open) { b.appendChild(svgIcon(LOCK_SVG, 'lock')); return; }       // greyed out until its group is reachable
+        const p = previewURL(d, size);
+        const mini = el('mini', b); mini.style.cssText = `width:${p.w}px;height:${p.h}px;background-image:url(${p.url})`;
+        el('num', b).textContent = d.challenge ? '\u2605' : l + 1;
+        if (progress.isDone(w, l)) el('tick', b).textContent = '\u2713';
+      },
+      act(o) { if (open) { sfx.enterLevel(); nav.level(w, l, o); } else { bump(this); sfx.locked(); } },
+    };
+  });
   doors.push({ r: m.exit[0], c: m.exit[1], cls: 'exit',
     fill(b) { b.appendChild(svgIcon(BACK_SVG, 'icon')); }, act() { sfx.back(); nav.hub(w); } });
   build({ W: m.W, H: m.H, hue: def.hue, doors, map: { m, rows: m.rows } });
