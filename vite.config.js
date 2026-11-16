@@ -6,4 +6,22 @@ let commit = process.env.COMMIT || 'nogit'; if (commit === 'nogit') try { commit
 // absolute site URL for the social-card tags in index.html (%VITE_SITE%)
 process.env.VITE_SITE = process.env.VITE_SITE || 'https://twist-game.vercel.app';
 // Root-absolute assets so /embed and /embed/ load the same files with no redirect.
-export default defineConfig({ base: '/', server: { host: true }, define: { __BUILD__: JSON.stringify(commit + ' ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z') } });
+// Web Analytics for this static site is the HTML snippet from Vercel's quickstart
+// (not the @vercel/analytics package, and not Speed Insights). Production builds only.
+function vercelWebAnalytics() {
+  const snippet = `<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>`;
+  return {
+    name: 'vercel-web-analytics',
+    apply: 'build',
+    transformIndexHtml(html) { return html.replace('</head>', snippet + '\n</head>'); },
+  };
+}
+export default defineConfig({
+  base: '/',
+  server: { host: true },
+  plugins: [vercelWebAnalytics()],
+  define: { __BUILD__: JSON.stringify(commit + ' ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z') },
+});
