@@ -6,4 +6,7 @@ import slide from './worlds/slide.js';
 import warp from './worlds/warp.js';
 import gate from './worlds/gate.js';
 
-export const WORLDS = [twist, slide, warp, gate];
+// The embed build (EMBED=1, see `npm run build:embed`) is a short taster for links / social cards: just the first four Twist levels.
+const EMBED = typeof __EMBED__ !== 'undefined' && __EMBED__;
+const taster = { ...twist, levels: twist.levels.slice(0, 4), groups: [[0, 1, 2, 3]], map: ['X0123'] };
+export const WORLDS = EMBED ? [taster] : [twist, slide, warp, gate];
