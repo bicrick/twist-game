@@ -8,6 +8,10 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET' || u.origin !== location.origin) return;
   // Unhashed OST beds: leave them off the SW cache so a new deploy isn't stuck with stale files.
   if (u.pathname.includes('/music/')) return;
+  // Vercel Web Analytics is same-origin and unhashed (/_vercel/insights/script.js).
+  // Leave it to the network: cache-first would pin a stale script, and a failed
+  // respondWith would drop the pageview. Event posts are not GET, so they already skip this.
+  if (u.pathname.startsWith('/_vercel/')) return;
   const put = (c, key, r) => { if (r.ok && !r.redirected) c.put(key, r.clone()).catch(() => {}); };
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => put(c, './', copy)).catch(() => {}); return r; })
