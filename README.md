@@ -17,6 +17,9 @@ Every world also has optional **challenge levels** (they never block progress). 
 - **Keyboard:** WASD / arrows move, `Z` undo, `Y` redo, `R` reset, `Esc` pause (back in menus), `Tab` menu, `N` mute.
 - **Touch:** on-screen pad (D-pad, Reset, Undo, Redo, Back, Menu) or swipe.
 
+## Testing on a real phone
+Open `https://twist-game.vercel.app/?debug=1` and screenshot the small panel (frame rate, viewport, touch type, safe-area insets, installed/offline state). Add to Home Screen to try the installed version.
+
 ## Develop
 ```bash
 npm install

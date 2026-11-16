@@ -55,6 +55,7 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 - **Lighthouse (mobile, throttled) on production:** Performance 97, Best Practices 100, SEO 100, Accessibility 92 -> fixed its one finding (the viewport tag blocked pinch-zoom). Re-run: `CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npx lighthouse https://twist-game.vercel.app --form-factor=mobile --output=json`.
 - **Sound audit by measurement** (Web Audio output tapped through an analyser, after a real user gesture): all 19 game sound events produce signal (peaks 0.024-0.18, 0.05-0.9 s long, tonal centroids 228 Hz-5 kHz so they are distinguishable); mute and volume 0 give exact silence, volume scales the level, the 4 sound styles have clearly different timbres.
 - **Level variety audit** (`node tools/audit_levels.mjs`): 36 levels, 10 distinct mechanic combos, 8 board sizes, 1-2 blocks; moves 3-32 main (avg 17), 30-49 challenge (avg 38); per-world group averages rise monotonically (Twist 7>11>13>15, Slide 14>21>28, Warp 11>20>26, Gate 12>23>30).
+- **Real-device testing aid:** open https://twist-game.vercel.app/?debug=1 on a phone (`src/ui/debug.js`, loaded only with that flag) and screenshot the panel: fps / worst frame / heap, viewport + pixel ratio, pointer type (coarse = touch), safe-area insets (notch / home bar), standalone (installed) mode, service worker + online state, audio gesture state, motion settings.
 - NOT done (cannot be from here): a physical phone, listening to the sounds with ears.
 
 ## Ideas / next
