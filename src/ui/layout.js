@@ -7,7 +7,9 @@ const MAX = 80, MIN = 24, LEVEL_PAD = 1.8;
 let maxW = 0, maxH = 0;
 WORLDS.forEach(w => w.levels.forEach(l => { maxW = Math.max(maxW, l.w); maxH = Math.max(maxH, l.h); }));
 
-const fit = (W, H) => Math.floor(Math.min((innerWidth - 40) / W, (innerHeight - 150) / H));
+// the visible game area (excludes the touch pad when shown)
+export const screenSize = () => { const s = document.getElementById('screen'); return [s.clientWidth, s.clientHeight]; };
+const fit = (W, H) => { const [w, h] = screenSize(); return Math.floor(Math.min((w - 40) / W, (h - 130) / H)); };
 export const baseCell = () => Math.max(MIN, Math.min(MAX, fit(maxW + LEVEL_PAD, maxH + LEVEL_PAD)));
 export const levelCell = baseCell;
 export const roomCell = (W, H) => Math.max(MIN, Math.min(baseCell(), fit(W, H)));

@@ -1,6 +1,6 @@
 /* Player, blocks (bananas) and their target ghosts. */
-.piece { position: absolute; border-radius: 13%; background: var(--c); z-index: 5;
-         box-shadow: 0 4px 0 rgba(0,0,0,.2); transition: left .12s ease, top .12s ease, opacity .12s ease; }
+.piece { position: absolute; left: 0; top: 0; border-radius: 13%; background: var(--c); z-index: 5;
+         box-shadow: 0 4px 0 rgba(0,0,0,.2); transition: transform .12s ease, opacity .12s ease; }
 .piece .face { position: absolute; inset: 0; transition: transform .22s ease; }
 .piece.player { --c: var(--player); }
 .piece.blk { --c: var(--block); background: transparent; box-shadow: none; filter: drop-shadow(0 5px 0 rgba(0,0,0,.17)); }
@@ -15,7 +15,7 @@
 
 /* ghosts: dashed outlines of where a block / the player must end up */
 .piece.ghost { background: color-mix(in srgb, var(--c) 13%, transparent); border: 3px dashed var(--c); box-shadow: none; z-index: 2;
-  transition: left .12s ease, top .12s ease, background .25s ease, border-color .25s ease, box-shadow .25s ease; }
+  transition: transform .12s ease, background .25s ease, border-color .25s ease, box-shadow .25s ease; }
 .piece.ghost.blk { --c: var(--block); border: none; background: none; border-radius: 50%; filter: none; }
 .piece.ghost.home { --c: var(--home); }
 .piece.ghost .face { opacity: .8; }
@@ -34,4 +34,9 @@
 @keyframes ping { from { transform: scale(1); opacity: .9; } to { transform: scale(1.7); opacity: 0; } }
 @keyframes pulse { 0% { transform: scale(1); } 40% { transform: scale(1.035); } 100% { transform: scale(1); } }
 .win #floor { animation: pulse .6s ease; }
-.win .piece.player, .win .piece.blk { animation: pulse .6s ease; }
+
+/* reflections are decoration: keep them cheap (no shadows/filters), and isolate their layout */
+.copy { contain: layout style; }
+.copy .piece, .copy .piece.player { box-shadow: none; }
+.copy .piece.blk { filter: none; }
+.copy .piece.ghost.ok { box-shadow: none; }

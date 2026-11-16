@@ -2,6 +2,7 @@
 export default {
   name: "Mirror",
   sub: "floors that flip you over",
+  icon: '<svg viewBox="0 0 24 24"><path d="M12 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 3.6" fill="none"/><path d="M9.5 7 3.5 18h6z" fill="currentColor"/><path d="M14.5 7l6 11h-6z" fill="currentColor" opacity=".5"/></svg>',
   hue: 335,
   intro: "Mirror pads flip whatever steps onto them — you, or the thing you push.",
   // Room map (see ui/rooms.js): # stone  . floor  , trail  S start  X back door  0-9a-z level index

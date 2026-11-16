@@ -1,0 +1,52 @@
+/* On-screen gamepad (Game Boy Advance emulator style). Shown on touch / small screens via html.with-pad.
+   Restyle with the tokens below; layout is plain absolute positioning. */
+:root { --pad-body: #4d4f9a; --pad-body-2: #3f4184; --pad-key: #2b2c55; --pad-key-hi: #3a3b6e; --pad-a: #c23b6a; --pad-b: #d9577f;
+        --pad-label: rgba(255,255,255,.55); --pad-u: clamp(38px, 6.2vh, 54px); --pad-side: clamp(150px, 24vw, 210px); }
+#pad { display: none; }
+html.with-pad #device { background: linear-gradient(160deg, var(--pad-body), var(--pad-body-2)); }
+html.with-pad #pad { display: block; position: absolute; z-index: 50; touch-action: none; }
+html.with-pad #screen { border-radius: 14px; box-shadow: 0 0 0 5px rgba(0,0,0,.35), 0 6px 0 5px rgba(0,0,0,.18); background: var(--bg); transition: background .5s ease; }
+
+/* portrait: screen on top, pad below */
+@media (orientation: portrait) {
+  html.with-pad #screen { inset: 14px 14px calc(var(--pad-h) + 4px) 14px; }
+  html.with-pad { --pad-h: clamp(210px, 32vh, 290px); }
+  html.with-pad #pad { left: 0; right: 0; bottom: 0; height: var(--pad-h); }
+  .dpad { left: 6%; top: 50%; transform: translateY(-62%); }
+  .abs { right: 6%; top: 50%; transform: translateY(-62%); }
+  .mid { left: 0; right: 0; bottom: 14px; justify-content: center; }
+}
+/* landscape: screen in the middle, D-pad left, buttons right */
+@media (orientation: landscape) {
+  html.with-pad #screen { inset: 10px var(--pad-side) 10px var(--pad-side); }
+  html.with-pad #pad { inset: 0; pointer-events: none; }
+  .dpad { left: calc(var(--pad-side) / 2); top: 50%; transform: translate(-50%, -58%); }
+  .abs { right: calc(var(--pad-side) / 2); top: 50%; transform: translate(50%, -58%); }
+  .mid { left: 0; right: 0; bottom: 10px; justify-content: space-between; padding: 0 calc(var(--pad-side) / 2 - 36px); }
+}
+
+.dpad, .abs, .mid { position: absolute; pointer-events: auto; }
+.dpad { width: calc(var(--pad-u) * 3); height: calc(var(--pad-u) * 3); }
+.dpad .k { position: absolute; width: var(--pad-u); height: var(--pad-u); background: var(--pad-key); border: 0; padding: 0;
+           color: var(--pad-label); display: flex; align-items: center; justify-content: center; touch-action: none; }
+.dpad .k svg { width: 46%; height: 46%; }
+.dpad .k.up { left: var(--pad-u); top: 0; border-radius: 8px 8px 0 0; }
+.dpad .k.down { left: var(--pad-u); bottom: 0; border-radius: 0 0 8px 8px; }
+.dpad .k.left { left: 0; top: var(--pad-u); border-radius: 8px 0 0 8px; }
+.dpad .k.right { right: 0; top: var(--pad-u); border-radius: 0 8px 8px 0; }
+.dpad::before { content: ''; position: absolute; left: var(--pad-u); top: var(--pad-u); width: var(--pad-u); height: var(--pad-u); background: var(--pad-key); }
+.dpad .k:active, .dpad .k.on { background: var(--pad-key-hi); }
+
+.abs { width: calc(var(--pad-u) * 3); height: calc(var(--pad-u) * 2.2); }
+.abs .b { position: absolute; width: calc(var(--pad-u) * 1.4); height: calc(var(--pad-u) * 1.4); border-radius: 50%; border: 0; padding: 0;
+          color: rgba(255,255,255,.9); font: 800 calc(var(--pad-u) * .5)/1 var(--font); touch-action: none;
+          box-shadow: 0 4px 0 rgba(0,0,0,.28), inset 0 3px 0 rgba(255,255,255,.18); }
+.abs .b.a { right: 0; top: 0; background: var(--pad-a); }
+.abs .b.bb { left: 0; bottom: 0; background: var(--pad-b); }
+.abs .b:active, .abs .b.on { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.28); }
+
+.mid { display: flex; gap: 22px; }
+.mid .s { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--pad-label); font: 700 10px/1 var(--font); letter-spacing: 1px; }
+.mid .s button { width: 54px; height: 16px; border-radius: 99px; border: 0; padding: 0; background: var(--pad-key); transform: rotate(-24deg); touch-action: none; }
+.mid .s button:active, .mid .s button.on { background: var(--pad-key-hi); }
+html.with-pad #hint { display: none; }

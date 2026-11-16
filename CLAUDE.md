@@ -1,7 +1,7 @@
 # Twist
 
 Original tile puzzle game (Baba Is You / Patrick's Parabox spirit). Static web game: vanilla JS ES modules + CSS, built/served with Vite. Target: playable on desktop and mobile.
-Controls are WASD/arrows, `z` undo, `r` restart, `Esc`/`m` back, `n` mute. Swipe moves on touch. Keys never invert.
+Controls are WASD/arrows, `z` undo, `r` restart, `Esc`/`m` back, `n` mute. On touch/small screens a GBA-style pad appears (`ui/controls.js`, `css/controls.css`; `?pad=1` forces it): D-pad = move, A = undo, B = back, Start = restart, Select = mute. Keys never invert.
 
 ## Run
 - `npm install`, `npm run dev` (http://localhost:5173), `npm run build` (static site in `dist/`), `npm test` (every level solvable, no duplicates).
@@ -20,7 +20,7 @@ Controls are WASD/arrows, `z` undo, `r` restart, `Esc`/`m` back, `n` mute. Swipe
 - `src/data/worlds.js` lists worlds in unlock order; one file per world in `src/data/worlds/` (levels + room map). Level: `{w,h,lr,tb,walls:[[r,c]],pads:[[r,c,'x'|'y']],player:[r,c,fx,fy],home:[r,c,fx,fy],blocks:[...],targets:[...]}`.
 - `src/audio/sfx.js`: every sound, by game event, using the `cuelume` npm package (synthesized Web Audio, "press" theme). Retune sounds only here; cue choices follow the table in node_modules/cuelume/README.md.
 - `src/state/progress.js`: localStorage (`twist-done2`, `twist-seen`, `twist-sound`). Do not rename keys.
-- `src/ui/`: `app.js` router (hub -> world room -> level), `rooms.js` (hub + world rooms), `level.js` (play), `board.js` (shared board: seams + tiled reflected copies; used by levels AND rooms), `layout.js` (one global cell size so zoom stays consistent), `pieces.js`, `input.js` (keyboard + swipe -> intents), `theme.js`, `banner.js`, `nav.js` (breaks import cycles).
+- `src/ui/`: `app.js` router (hub -> world room -> level), `rooms.js` (hub + world rooms), `level.js` (play), `board.js` (shared board: seams + tiled reflected copies; used by levels AND rooms), `layout.js` (one global cell size so zoom stays consistent), `pieces.js`, `input.js` (keyboard + swipe -> intents), `controls.js` (on-screen pad -> same intents), `transition.js` (every screen change goes through `swap()`: zoom in/out or fade, built hidden, input locked; never rebuild a screen directly), `theme.js`, `banner.js`, `nav.js` (breaks import cycles).
 - Test hooks on `window`: `__enter(w,l)`, `__world(w)`, `__hub()`, `__done()`, `__set(f)`.
 
 ## Tools (tools/, run with node)
@@ -31,6 +31,11 @@ Controls are WASD/arrows, `z` undo, `r` restart, `Esc`/`m` back, `n` mute. Swipe
 Parabox-like flat pastel look; no instruction sidebars; no gridlines; walls are irregular rounded stones; blocks are bananas (orientation visible via ghost outline; no red error tooltips); player has no ear/blob; matched targets glow green. Keep styling simple and centralized (CSS tokens) so it is easy to change later. Wants "handshake" puzzles solved by reasoning backwards, not brute force.
 Menu rooms look like levels (twisted seams + mirrored reflections); the seams are decorative only. World 1 has 10 levels, keep worlds short.
 World rooms are ASCII maps (`map` in each world file, parsed by `src/data/roommap.js`): `#` stone, `.` floor, `,` trail, `S` start, `X` back door, `0-9a-z` level index. Group levels into sections/branches with trails; `npm test` checks every level appears once and every door is reachable.
+
+## Performance rules
+- Reflections are decoration: max 15 panes (`MAX_PANES` in board.js), no blur/filters/shadows inside `.copy`. Move pieces with `transform`, never `left/top`. Avoid forced reflows (`offsetWidth`) per piece.
+- No pop-in: build while hidden (`#stage.building` disables transitions), reveal via `swap()`.
+- Seams are drawn as coloured lines only (the old edge arrows were removed on purpose).
 
 ## Next up / ideas
 - Mobile UI styled like a Game Boy Advanced emulator: on-screen D-pad (WASD) + buttons (undo/restart/back), as a separate module feeding the intents in `input.js`.

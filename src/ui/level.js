@@ -6,6 +6,7 @@ import { theme } from './theme.js';
 import { banner, hideBanner } from './banner.js';
 import { levelCell, LEVEL_MARGIN } from './layout.js';
 import { nav } from './nav.js';
+import { swap } from './transition.js';
 import { sfx } from '../audio/sfx.js';
 import { WORLDS } from '../data/worlds.js';
 import * as progress from '../state/progress.js';
@@ -21,7 +22,7 @@ export function start(w, l) {
   wi = w; li = l; state = parseLevel(WORLDS[w].levels[l]); hist = []; dirs = []; prev = {}; busy = false;
   hideBanner(); build();
 }
-export const restart = () => { sfx.restart(); start(wi, li); };
+export const restart = () => { sfx.restart(); swap(() => start(wi, li), { dir: 'fade' }); };
 export const leave = () => { sfx.leave(); nav.world(wi, li); };
 
 function addCells(root, L) {
@@ -52,7 +53,8 @@ function build() {
   $('hint').textContent = 'WASD move  ·  Z undo  ·  R restart  ·  Esc menu';
 }
 
-const snap = (n, x, y) => { n.style.transition = 'none'; n.style.left = x + 'px'; n.style.top = y + 'px'; void n.offsetWidth; n.style.transition = ''; };
+const at = (n, x, y) => { n.style.transform = `translate(${x}px, ${y}px)`; };
+const snap = (n, x, y) => { n.style.transition = 'none'; at(n, x, y); void n.offsetWidth; n.style.transition = ''; };
 function put(node, key, o, size, mobile) {
   const x = o.c * CELL + (CELL - size) / 2, y = o.r * CELL + (CELL - size) / 2, p = prev[key];
   const jumped = mobile && p && (p.r !== o.r || p.c !== o.c) && (o.r - p.r !== curDir[0] || o.c - p.c !== curDir[1]);
@@ -61,14 +63,14 @@ function put(node, key, o, size, mobile) {
     // slide out through the seam into the reflected pane while a twin slides in from the far side
     const tw = node.tw || (node.tw = piece(node.className.replace('piece ', ''), node.parentNode, size));
     const ox = p.c * CELL + (CELL - size) / 2, oy = p.r * CELL + (CELL - size) / 2, dx = curDir[1] * CELL, dy = curDir[0] * CELL;
-    node.style.left = ox + 'px'; node.style.top = oy + 'px';
+    at(node, ox, oy);
     tw.style.opacity = 0; snap(tw, x - dx, y - dy); orient(tw, o);
     void node.offsetWidth;
-    node.style.left = ox + dx + 'px'; node.style.top = oy + dy + 'px'; node.style.opacity = 0;
-    tw.style.left = x + 'px'; tw.style.top = y + 'px'; tw.style.opacity = 1;
+    at(node, ox + dx, oy + dy); node.style.opacity = 0;
+    at(tw, x, y); tw.style.opacity = 1;
     node.__done = () => { node.__done = null; snap(node, x, y); node.style.transition = 'none'; node.style.opacity = 1; void node.offsetWidth; node.style.transition = ''; tw.style.transition = 'none'; tw.style.opacity = 0; void tw.offsetWidth; tw.style.transition = ''; };
     node.__t = setTimeout(node.__done, 135);
-  } else { node.style.left = x + 'px'; node.style.top = y + 'px'; }
+  } else at(node, x, y);
   orient(node, o); prev[key] = { r: o.r, c: o.c };
 }
 function status(list, t) {
@@ -79,10 +81,10 @@ function status(list, t) {
 function ghostState(n, s, isMain) {
   const was = n.__s; n.__s = s;
   n.classList.toggle('ok', s === 'ok');
-  if (was !== undefined && was !== s && s === 'ok') {
+  if (isMain && was !== undefined && was !== s && s === 'ok') {
     n.classList.remove('pinging'); void n.offsetWidth; n.classList.add('pinging');
     setTimeout(() => n.classList.remove('pinging'), 700);
-    if (isMain) sfx.match();
+    sfx.match();
   }
 }
 function update() {

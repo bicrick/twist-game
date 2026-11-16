@@ -92,13 +92,14 @@ export function showHub(from) {
     return {
       r: 1, c: 1 + 2 * i, cls: open ? '' : 'locked', color: `hsl(${w.hue} 45% 60%)`,
       fill(b) {
-        el('name', b).textContent = w.name;
+        b.title = w.name; b.setAttribute('aria-label', w.name);
+        if (open) b.appendChild(svgIcon(w.icon, 'glyph'));
         if (!open) { b.appendChild(svgIcon(LOCK_SVG, 'lock')); return; }
         const pips = el('pips', b), n = progress.worldCount(i);
         w.levels.forEach((_, l) => { const i = document.createElement('i'); if (l < n) i.className = 'on'; pips.appendChild(i); });
       },
-      act() {
-        if (open) { sfx.enterWorld(); nav.world(i, null); }
+      act(o) {
+        if (open) { sfx.enterWorld(); nav.world(i, null, o); }
         else { bump(this); sfx.locked(); banner('Locked', 'Finish ' + WORLDS[i - 1].name + ' first', 2200); }
       },
     };
@@ -115,7 +116,7 @@ export function showWorld(w, from) {
   const doors = def.levels.map((d, l) => ({
     r: m.levels[l][0], c: m.levels[l][1], color: `hsl(${def.hue} 45% 58%)`,
     fill(b, size) { b.appendChild(preview(d, size)); el('num', b).textContent = l + 1; if (progress.isDone(w, l)) el('tick', b).textContent = '✓'; },
-    act() { sfx.enterLevel(); nav.level(w, l); },
+    act(o) { sfx.enterLevel(); nav.level(w, l, o); },
   }));
   doors.push({ r: m.exit[0], c: m.exit[1], cls: 'exit', color: `hsl(${def.hue} 30% 40%)`,
     fill(b) { b.appendChild(svgIcon(BACK_SVG, 'icon')); }, act() { sfx.back(); nav.hub(w); } });
@@ -137,6 +138,6 @@ export function roomMove(dr, dc) {
   if (r < 0 || c < 0 || r >= room.H || c >= room.W) return;
   if (room.map && room.map.m.walls.has(r + ',' + c)) return;
   const door = room.doors.find(d => d.r === r && d.c === c);
-  if (door) { door.act(); return; }
+  if (door) { door.act([door.c * cell + cell / 2, door.r * cell + cell / 2]); return; }
   pos = [r, c]; place(); sfx.roomStep();
 }
