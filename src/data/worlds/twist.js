@@ -16,7 +16,7 @@ export default {
     "ab,89..",
   ],
   levels: [
-  {"w":5,"h":1,"lr":"plain","tb":"none","walls":[],"player":[0,2],"blocks":[[0,1]],"targets":[[0,4]],"home":[0,1]},
+  {"w":5,"h":1,"lr":"plain","tb":"none","walls":[],"player":[0,2],"blocks":[[0,0]],"targets":[[0,4]],"home":[0,1]},
   {"w":5,"h":3,"lr":"twist","tb":"none","walls":[],"player":[0,2],"blocks":[[0,3]],"targets":[[2,0,0,1]],"home":[2,2,0,1]},
   {"w":5,"h":3,"lr":"twist","tb":"plain","walls":[[1,0]],"player":[2,2,0,1],"home":[0,0,0,1],"blocks":[[0,4,0,0]],"targets":[[0,1,0,0]]},
   {"w":5,"h":3,"lr":"twist","tb":"none","walls":[],"pads":[],"player":[1,0,1,1],"home":[2,4,1,0],"blocks":[[0,3,1,0]],"targets":[[0,0,1,0]]},
