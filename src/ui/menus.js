@@ -3,6 +3,7 @@ import { openMenu, closeMenu, closeAll } from './menu.js';
 import * as settings from '../state/settings.js';
 import * as progress from '../state/progress.js';
 import { nav } from './nav.js';
+import * as music from '../audio/music.js';
 
 // Feather-style stroke icons (inner SVG, 24x24)
 const I = {
@@ -18,6 +19,7 @@ const I = {
   motion: '<path d="M4 8h10a3 3 0 1 0-3-3"/><path d="M2 12h16a3 3 0 1 1-3 3"/><path d="M5 16h6"/>',
   trail: '<circle cx="18" cy="12" r="3.5" fill="currentColor"/><circle cx="10" cy="12" r="2.2"/><circle cx="4.5" cy="12" r="1.2"/>',
   haptic: '<rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M3 8v8M21 8v8"/>',
+  music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3" fill="currentColor"/><circle cx="18" cy="16" r="3" fill="currentColor"/>',
   trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V3h6v3"/>',
   back: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
 };
@@ -30,6 +32,9 @@ export function openSettings() {
     { icon: () => settings.get('sound') ? I.sound : I.mute, label: 'Sound', kind: 'switch', on: () => settings.get('sound'), act: flip('sound') },
     { icon: I.volume, label: () => 'Volume ' + Math.round(settings.get('volume') * 100) + '%', kind: 'bar', n: 10, at: () => Math.round(settings.get('volume') * 10),
       set: i => settings.set('volume', i / 10), step: d => settings.set('volume', Math.min(1, Math.max(0, Math.round(settings.get('volume') * 10 + d) / 10))) },
+    { icon: I.music, label: 'Music', kind: 'switch', on: () => music.get('enabled'), act: () => music.toggle() },
+    { icon: I.music, label: () => 'Music volume ' + Math.round(music.get('volume') * 100) + '%', kind: 'bar', n: 10, at: () => Math.round(music.get('volume') * 10),
+      set: i => music.set('volume', i / 10), step: d => music.set('volume', Math.min(1, Math.max(0, Math.round(music.get('volume') * 10 + d) / 10))) },
     { icon: I.wave, label: () => 'Sound style: ' + cap(settings.get('style')), kind: 'dots', n: settings.STYLES.length, at: () => settings.STYLES.indexOf(settings.get('style')),
       set: i => settings.set('style', settings.STYLES[i]), step: d => { const n = settings.STYLES.length; settings.set('style', settings.STYLES[(settings.STYLES.indexOf(settings.get('style')) + d + n) % n]); } },
     { icon: I.motion, label: 'Reduce motion', kind: 'switch', on: () => settings.get('reduceMotion'), act: flip('reduceMotion') },

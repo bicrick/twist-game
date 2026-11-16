@@ -14,7 +14,7 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; margin: 0; }
 body { background: var(--bg); transition: background .5s ease; font-family: var(--font);
-       overflow: hidden; user-select: none; touch-action: none; overscroll-behavior: none; }
+       overflow: hidden; user-select: none; touch-action: none; overscroll-behavior: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 /* #device holds the game screen (and, on touch screens, the pad: see controls.css) */
 #device { position: fixed; inset: 0; }
 #screen { position: absolute; inset: 0; background: var(--bg); transition: background .5s ease; display: flex; align-items: center; justify-content: center; overflow: hidden; }
