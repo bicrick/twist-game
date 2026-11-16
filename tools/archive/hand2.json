@@ -1,0 +1,3 @@
+[
+ {"name":"pad","w":5,"h":1,"lr":"none","tb":"none","walls":[],"pads":[[0,2,"x"]],"player":[0,0],"blocks":[[0,1]],"targets":[[0,3,1,0]],"home":[0,2,1,0]}
+]
