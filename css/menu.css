@@ -2,7 +2,7 @@
 #menu { position: absolute; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; padding: 14px; background: rgba(3,6,9,.66); }
 #menu.on { display: flex; animation: menuIn .14s ease-out; }
 @keyframes menuIn { from { opacity: 0; } to { opacity: 1; } }
-#menu .card { width: min(100%, 400px); max-height: 100%; overflow-y: auto; background: var(--card); border-radius: 26px; padding: 14px 12px 12px;
+#menu .card { width: min(100%, 400px); max-height: 100%; overflow-y: auto; touch-action: pan-y; background: var(--card); border-radius: 26px; padding: 14px 12px 12px;
               box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 22px 60px rgba(0,0,0,.55); animation: cardIn .18s ease-out; }
 @keyframes cardIn { from { transform: translateY(8px) scale(.98); } to { transform: none; } }
 #menu .card.grid { width: min(100%, 340px); }
@@ -20,6 +20,8 @@
 #menu .row .ico { width: 26px; height: 26px; flex: none; }
 #menu .row.sel { background: var(--card-2); color: var(--ink); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--wall) 70%, transparent); }
 #menu .row.danger { color: #ff7b86; }
+#menu .row.inert { opacity: .55; cursor: default; }
+#menu .row .name { margin-left: auto; font: 600 13px/1 var(--font); color: var(--ink-soft); }
 #menu .row.button { justify-content: flex-start; }
 #menu .sw { width: 50px; height: 28px; border-radius: 99px; background: rgba(255,255,255,.14); position: relative; transition: background .15s; flex: none; }
 #menu .sw .knob { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .15s; }

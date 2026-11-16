@@ -19,7 +19,14 @@ export function bindInput(h) {
   // swipe anywhere on the screen = move (off when the on-screen pad is showing). A tap does nothing.
   const padOn = () => document.documentElement.classList.contains('with-pad');
   let t0 = null;
-  addEventListener('pointerdown', e => { h.gesture(); if (e.pointerType !== 'mouse' && !padOn()) t0 = [e.clientX, e.clientY]; });
+  // Capture so a control that stops the bubble (title Settings, menu rows) still unlocks audio.
+  addEventListener('pointerdown', e => { h.gesture(); if (e.pointerType !== 'mouse' && !padOn()) t0 = [e.clientX, e.clientY]; }, true);
+  // Some iOS webviews only unlock audio on touchend, and they scroll/rubber-band unless the move is cancelled.
+  addEventListener('touchend', () => h.gesture(), { passive: true, capture: true });
+  addEventListener('touchmove', e => {
+    if (e.target.closest && e.target.closest('#menu .card')) return;
+    if (e.cancelable) e.preventDefault();
+  }, { passive: false, capture: true });
   addEventListener('pointerup', e => {
     if (!t0) return;
     const dx = e.clientX - t0[0], dy = e.clientY - t0[1]; t0 = null;

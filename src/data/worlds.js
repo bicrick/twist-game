@@ -6,7 +6,6 @@ import slide from './worlds/slide.js';
 import warp from './worlds/warp.js';
 import gate from './worlds/gate.js';
 
-// The taster at /embed (or ?embed) is a short version for links / social cards: just the first four Twist levels.
-export const EMBED = typeof location !== 'undefined' && (/\/embed\/?$/.test(location.pathname) || /[?&]embed\b/.test(location.search));
-const taster = { ...twist, levels: twist.levels.slice(0, 4), groups: [[0, 1, 2, 3]], map: ['X0123'] };
-export const WORLDS = EMBED ? [taster] : [twist, slide, warp, gate];
+// /embed is this same list. It used to be a 4-level Twist taster (own save) for social links.
+// The card image (og.png) is unchanged; the page is the full game so an in-app browser can play it.
+export const WORLDS = [twist, slide, warp, gate];

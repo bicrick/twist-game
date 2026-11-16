@@ -23,6 +23,7 @@ export function closeMenu() {
 export function closeAll() { while (stack.length) { const t = stack.pop(); if (t.spec.onClose) t.spec.onClose(); } draw(); notifyStack(); }
 
 const val = (v, ...a) => typeof v === 'function' ? v(...a) : v;
+const blocked = it => typeof it.inert === 'function' ? !!it.inert() : !!it.inert;
 
 function control(it, i, host, top) {
   if (it.kind === 'switch') { const s = el('sw' + (it.on() ? ' on' : ''), host); el('knob', s); }
@@ -49,10 +50,13 @@ function draw() {
   const body = el(grid ? 'tiles' : 'rows', card);
   if (grid) body.style.setProperty('--cols', top.spec.cols || 3);
   top.spec.items.forEach((it, i) => {
-    const row = el((grid ? 'tile' : 'row') + (i === top.sel ? ' sel' : '') + (it.danger ? ' danger' : '') + ' ' + (it.kind || 'button'), body);
+    const off = blocked(it);
+    const row = el((grid ? 'tile' : 'row') + (i === top.sel ? ' sel' : '') + (it.danger ? ' danger' : '') + (off ? ' inert' : '') + ' ' + (it.kind || 'button'), body);
     row.setAttribute('role', 'menuitem'); row.dataset.label = val(it.label); row.setAttribute('aria-label', val(it.label));
+    if (off) row.setAttribute('aria-disabled', 'true');
     el('ico', row).innerHTML = icon(val(it.icon));
-    if (!grid) control(it, i, row, top);
+    if (!grid && !off) control(it, i, row, top);
+    else if (!grid && off) el('name', row).textContent = 'Unavailable';
     row.onpointerdown = e => { e.stopPropagation(); top.sel = i; if (!e.target.classList.contains('seg')) activate(); };
   });
   const cur = top.spec.items[top.sel];
@@ -62,12 +66,14 @@ function draw() {
 function adjust(d) {
   const top = stack[stack.length - 1]; if (!top) return;
   const it = top.spec.items[top.sel];
+  if (blocked(it)) return;
   if (it.step) { it.step(d); sfx.pick(); draw(); }
   else if (it.kind === 'switch' && it.act) { it.act(); sfx.pick(); draw(); }
 }
 function activate() {
   const top = stack[stack.length - 1]; if (!top) return;
   const it = top.spec.items[top.sel];
+  if (blocked(it)) { draw(); return; }
   if (it.act) { sfx.confirm(); it.act(); } else if (it.step) { it.step(1); sfx.pick(); }
   if (stack[stack.length - 1] === top) draw();
 }

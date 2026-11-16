@@ -13,6 +13,8 @@ import * as settings from '../state/settings.js';
 import { isOpen as menuOpen, closeMenu, menuDir, menuActivate, onStackChange } from './menu.js';
 import { openPause, openSettings } from './menus.js';
 import { initParticles } from './particles.js';
+import { bindViewport } from './viewport.js';
+import { pulse as hapticPulse } from './haptics.js';
 
 let mode = 'title', world = 0;
 let musicT = 0;
@@ -23,7 +25,7 @@ export function startApp() {
   const idle = () => setPadState({ undo: false, redo: false, reset: false });
   nav.title = first => swap(() => { mode = 'title'; idle(); showTitle(); syncMusic(); }, { dir: 'out', first });
   nav.start = () => {
-    if (isBusy() || mode !== 'title') return; sfx.unlock(); sfx.enterWorld();
+    if (isBusy() || mode !== 'title') return; hapticPulse(); handlers.gesture(); sfx.enterWorld();
     // first ever play: straight into the first level
     if (progress.totals().solved === 0) return swap(() => { mode = 'level'; world = 0; level.start(0, 0); syncMusic(); }, { dir: 'in' });
     swap(() => { mode = 'hub'; idle(); showHub(null); syncMusic(); }, { dir: 'in' });
@@ -36,10 +38,10 @@ export function startApp() {
   const handlers = {
     gesture: () => { sfx.unlock(); music.unlock(); },
     confirm: () => { if (menuOpen()) menuActivate(); else if (mode === 'title') nav.start(); },
-    dir: (dr, dc) => { if (menuOpen()) return menuDir(dr, dc); if (isBusy()) return; if (mode === 'title') return nav.start(); if (mode === 'level') level.move(dr, dc); else roomMove(dr, dc); },
-    undo: () => { if (menuOpen()) return closeMenu(); if (isBusy()) return; if (mode === 'level') level.undo(); else if (mode === 'hub' || mode === 'world') handlers.back(); },
-    redo: () => { if (!menuOpen() && !isBusy() && mode === 'level') level.redo(); },
-    restart: () => { if (!menuOpen() && !isBusy() && mode === 'level' && !level.isBusy()) level.restart(); },
+    dir: (dr, dc) => { if (menuOpen()) return menuDir(dr, dc); if (mode === 'title') return nav.start(); hapticPulse(); if (isBusy()) return; if (mode === 'level') level.move(dr, dc); else roomMove(dr, dc); },
+    undo: () => { if (menuOpen()) return closeMenu(); hapticPulse(); if (isBusy()) return; if (mode === 'level') level.undo(); else if (mode === 'hub' || mode === 'world') handlers.back(); },
+    redo: () => { if (!menuOpen() && !isBusy() && mode === 'level') { hapticPulse(); level.redo(); } },
+    restart: () => { if (!menuOpen() && !isBusy() && mode === 'level' && !level.isBusy()) { hapticPulse(); level.restart(); } },
     back: () => {
       if (menuOpen()) return closeMenu();
       if (isBusy()) return;
@@ -56,13 +58,19 @@ export function startApp() {
     mute: () => settings.toggleSound(),
   };
   // leaving the tab pauses a level that is in progress
-  document.addEventListener('visibilitychange', () => { if (document.hidden && mode === 'level' && !menuOpen() && !level.isBusy() && !isBusy()) openPause(level); });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) handlers.gesture();
+    else if (mode === 'level' && !menuOpen() && !level.isBusy() && !isBusy()) openPause(level);
+  });
+  addEventListener('pageshow', () => handlers.gesture());
   initParticles();
   level.hooks.onHistory = setPadState;
   initControls(handlers); // must come before the resize handler below
   bindInput(handlers);
   let rt = 0; // rebuild once resizing settles, not on every event
-  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => swap(() => { if (mode === 'level') level.rebuild(); else if (mode === 'world') showWorld(world, null); else if (mode === 'hub') showHub(null); else showTitle(); }, { dir: 'fade' }), 120); });
+  const refit = () => { clearTimeout(rt); rt = setTimeout(() => swap(() => { if (mode === 'level') level.rebuild(); else if (mode === 'world') showWorld(world, null); else if (mode === 'hub') showHub(null); else showTitle(); }, { dir: 'fade' }), 120); };
+  addEventListener('resize', refit);
+  bindViewport(refit);
 
   // test hooks (used by browser checks)
   Object.assign(window, { __room: roomInfo, __level: level, __progress: progress, __enter: nav.level, __world: w => nav.world(w, null), __hub: () => nav.hub(null), __done: progress.allDone, __set: level.debugSet });
