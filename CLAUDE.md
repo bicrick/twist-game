@@ -6,7 +6,7 @@ The whole idea, in the user's words: *a Grok-bot-esque twist on Patrick's Parabo
 ## Run / test
 - `npm install`, `npm run dev` (http://localhost:5173), `npm run build` (static site in `dist/`), `npm test` (every level solvable + unique, room maps valid, groups valid).
 - `npm run paths` writes `tools/paths.json` (solutions for every level). Replay them in the browser through real key events to verify a full playthrough (see "Verification").
-- Live: https://twist-game.vercel.app (Vercel project `twist-game`, account bicrick; redeploy with `npx vercel deploy --prod --yes`, or `npm run deploy`). Linked via `.vercel/` (gitignored). Vite is auto-detected (build `npm run build`, output `dist`).
+- Live: https://twist-game.vercel.app (Vercel project `twist-game`, account bicrick; redeploy with `npm run deploy` (passes the commit id into the build)). Linked via `.vercel/` (gitignored). Vite is auto-detected (build `npm run build`, output `dist`).
 - CI: `.github/workflows/pages.yml` tests, builds and deploys `dist/` to GitHub Pages on push to main.
 
 ## Game
@@ -56,6 +56,7 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 - **Lighthouse (mobile, throttled) on production:** Performance 97, Best Practices 100, SEO 100, Accessibility 92 -> fixed its one finding (the viewport tag blocked pinch-zoom). Re-run: `CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npx lighthouse https://twist-game.vercel.app --form-factor=mobile --output=json`.
 - **Sound audit by measurement** (Web Audio output tapped through an analyser, after a real user gesture): all 19 game sound events produce signal (peaks 0.024-0.18, 0.05-0.9 s long, tonal centroids 228 Hz-5 kHz so they are distinguishable); mute and volume 0 give exact silence, volume scales the level, the 4 sound styles have clearly different timbres.
 - **Level variety audit** (`node tools/audit_levels.mjs`): 36 levels, 10 distinct mechanic combos, 8 board sizes, 1-2 blocks; moves 3-32 main (avg 17), 30-49 challenge (avg 38); per-world group averages rise monotonically (Twist 7>11>13>15, Slide 14>21>28, Warp 11>20>26, Gate 12>23>30).
+- **Offline + updates (tested on the live site):** service worker v2 is network-first for pages / cache-first for hashed assets. Offline reload shows the game and Play reaches the hub with 0 errors; a returning visitor with the old service worker gets a redeploy on their very next load (bundle hash changed on first reload). Build id (commit + time) is in `window.__BUILD__` and the `?debug=1` panel.
 - **Real-device testing aid:** open https://twist-game.vercel.app/?debug=1 on a phone (`src/ui/debug.js`, loaded only with that flag) and screenshot the panel: fps / worst frame / heap, viewport + pixel ratio, pointer type (coarse = touch), safe-area insets (notch / home bar), standalone (installed) mode, service worker + online state, audio gesture state, motion settings.
 - NOT done (cannot be from here): a physical phone, listening to the sounds with ears.
 
