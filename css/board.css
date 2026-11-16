@@ -4,9 +4,14 @@
 .copy { position: absolute; z-index: 1; background: var(--floor); transition: background .5s ease; contain: layout style; }
 .cell { position: absolute; width: var(--cell); height: var(--cell); }
 /* walls: bright clay stones with a darker underside */
-/* walls: bright clay stones: darker underside + a soft top highlight (the Parabox bevel, in clay) */
-.cell.wall::before { content: ''; position: absolute; inset: 3%; background: var(--wall); border-radius: 34%;
-  box-shadow: inset 0 calc(var(--cell) * -.13) 0 var(--wall-shade), inset 0 calc(var(--cell) * .05) 0 rgba(255,255,255,.3); }
+/* walls: bright clay slabs: darker underside + soft top highlight. Neighbouring walls MERGE into one slab (no seams),
+   and walls on a solid edge fuse with the rim: classes wn/we/ws/ww say which sides touch another wall. */
+.cell.wall::before { content: ''; position: absolute; top: 3%; right: 3%; bottom: 3%; left: 3%; background: var(--wall); border-radius: 34%;
+  --hi: inset 0 calc(var(--cell) * .05) 0 rgba(255,255,255,.3); --sh: inset 0 calc(var(--cell) * -.13) 0 var(--wall-shade); box-shadow: var(--hi), var(--sh); }
+.cell.wall.wn::before { top: -.5px; border-top-left-radius: 0; border-top-right-radius: 0; --hi: inset 0 0 0 0 transparent; }
+.cell.wall.ws::before { bottom: -.5px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; --sh: inset 0 0 0 0 transparent; }
+.cell.wall.ww::before { left: -.5px; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.cell.wall.we::before { right: -.5px; border-top-right-radius: 0; border-bottom-right-radius: 0; }
 .cell.pad::after { content: ''; position: absolute; inset: 14%; background: color-mix(in srgb, var(--padc) 16%, transparent);
   border: var(--b) solid var(--padc); border-radius: 28%; display: flex; align-items: center; justify-content: center;
   font: 800 calc(var(--cell) * .4)/1 var(--font); color: var(--padc); }

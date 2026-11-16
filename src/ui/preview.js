@@ -20,7 +20,7 @@ export function previewURL(def, box) {
   const ring = (x, y, k, col) => { g.beginPath(); g.roundRect(x + s * .14 + 1, y + s * .14 + 1, s * .72 - 2, s * .72 - 2, s * .26); g.strokeStyle = col; g.lineWidth = 2; g.stroke(); };
   for (let r = 0; r < def.h; r++) for (let c = 0; c < def.w; c++) {
     const k = r + ',' + c, x = e + c * s, y = e + r * s;
-    if (walls.has(k)) rr(x + s * .04, y + s * .04, s * .92, s * .92, s * .34, css('--wall'));
+    if (walls.has(k)) (g.fillStyle = css('--wall'), g.fillRect(x, y, s, s));
     else if (pads.has(k) && !blocks.has(k) && k !== pk) { g.fillStyle = css('--padc'); g.fillRect(x + s * .25, y + s * .25, s * .5, s * .5); }
     else if (blocks.has(k)) rr(x + s * .12, y + s * .12, s * .76, s * .76, s * .3, css('--block'));
     else if (k === pk) rr(x + s * .12, y + s * .12, s * .76, s * .76, s * .3, css('--player'));

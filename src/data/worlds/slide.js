@@ -4,6 +4,7 @@ export default {
   sub: "blocks that keep going",
   icon: '<svg viewBox="0 0 24 24"><path d="M3 8h6M2 12h9M3 16h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><rect x="13" y="6.5" width="9" height="11" rx="3.4" fill="currentColor"/></svg>',
   hue: 150,
+  bot: { shape: 'droplet', color: '#8a5cf5' },   // this world's player (new behaviour = new guy)
   // level groups (state/progress.js): a group opens when the one before it is solved
   groups: [[0,1],[2,3],[4,5]],
   // Room map (see data/roommap.js): . floor  , trail  X back door  0-9a-z level index. Doors sit next to each other; adjacent cells are joined by a connector.

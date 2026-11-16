@@ -1,6 +1,6 @@
 // On-screen gamepad: a D-pad plus A / B / Start / Select, GBA-emulator style.
 // Pure input: turns presses into the same intents as the keyboard (see input.js).
-//   D-pad = move (hold to repeat, slide to change direction)   A = undo   B = back / pause   Start = menu   Select = restart
+//   D-pad = move (hold to repeat, slide to change direction)   Undo / Redo / Reset (greyed when unavailable)   Back   Menu
 import { $, el } from './dom.js';
 import * as settings from '../state/settings.js';
 
@@ -52,12 +52,27 @@ export function initControls(h) {
   dpad.addEventListener('pointerdown', e => { e.preventDefault(); active = true; try { dpad.setPointerCapture(e.pointerId); } catch (err) {} h.gesture(); setDir(dirAt(e)); });
   dpad.addEventListener('pointermove', e => { if (active) setDir(dirAt(e)); });
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => dpad.addEventListener(ev, () => { active = false; setDir(null); }));
-  const abs = el('abs', pad);
-  const btn = (cls, label, aria, fn, parent) => { const b = document.createElement('button'); b.className = cls; b.textContent = label; b.setAttribute('aria-label', aria); parent.appendChild(b); press(b, fn); return b; };
-  btn('b bb', 'B', 'back', () => h.back(), abs);
-  btn('b a', 'A', 'undo', () => h.undo(), abs);
+  // right cluster: Reset (top), Undo + Redo (bottom). Icons, greyed out when they would do nothing.
+  const acts = el('acts', pad);
+  const icon = (cls, aria, svg, fn) => {
+    const b = document.createElement('button'); b.className = 'act ' + cls; b.setAttribute('aria-label', aria); b.innerHTML = svg; acts.appendChild(b);
+    press(b, () => { if (!b.classList.contains('dim')) fn(); }); return b;
+  };
+  const SV = d => '<svg viewBox="0 0 24 24"><path d="' + d + '" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const bReset = icon('reset', 'reset level', SV('M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5'), () => h.restart());
+  const bUndo = icon('undo', 'undo', SV('M9 14 4 9l5-5M4 9h9a6 6 0 0 1 0 12h-3'), () => h.undo());
+  const bRedo = icon('redo', 'redo', SV('M15 14l5-5-5-5M20 9h-9a6 6 0 0 0 0 12h3'), () => h.redo());
+  padBtns = { undo: bUndo, redo: bRedo, reset: bReset };
+  // bottom row: plain buttons
   const mid = el('mid', pad);
-  [['SELECT', 'restart', () => h.restart()], ['START', 'menu', () => h.menu()]].forEach(([label, aria, fn]) => {
-    const s = el('s', mid); btn('', '', aria, fn, s); s.appendChild(document.createTextNode(label));
+  [['Back', () => h.back()], ['Menu', () => h.menu()]].forEach(([label, fn]) => {
+    const b = document.createElement('button'); b.className = 'pill'; b.textContent = label; mid.appendChild(b); press(b, fn);
   });
+}
+
+let padBtns = null, padWant = { undo: false, redo: false, reset: false };
+// the level tells the pad which of its action buttons currently do something
+export function setPadState(st) {
+  padWant = { ...padWant, ...st };
+  if (padBtns) for (const k of Object.keys(padBtns)) padBtns[k].classList.toggle('dim', !padWant[k]);
 }

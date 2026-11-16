@@ -42,7 +42,7 @@ function addContent(root, spec) {
 
 // spec: { W, H, hue, doors:[{r,c,cls,color,fill(node,size),act(origin)}], map? }
 function build(spec) {
-  room = spec; theme(spec.hue);
+  room = spec; theme(spec.hue, spec.bot);
   cell = roomCell(spec.W, spec.H);
   const st = $('stage'); st.innerHTML = ''; st.classList.remove('win', 'title-mode'); st.style.margin = '';
   st.style.setProperty('--cell', cell + 'px');
@@ -116,7 +116,7 @@ export function showWorld(w, from) {
   });
   doors.push({ r: m.exit[0], c: m.exit[1], cls: 'exit',
     fill(b) { b.appendChild(svgIcon(BACK_SVG, 'icon')); }, act() { sfx.back(); nav.hub(w); } });
-  build({ W: m.W, H: m.H, hue: def.hue, doors, map: { m, rows: m.rows } });
+  build({ W: m.W, H: m.H, hue: def.hue, bot: def.bot, doors, map: { m, rows: m.rows } });
   room.mode = 'world';
 }
 // a free cell beside a door, preferring below it

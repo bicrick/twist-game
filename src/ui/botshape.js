@@ -28,3 +28,24 @@ export function pebblePath() {
   }
   return 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L') + 'Z';
 }
+
+// rounded polygon: corners softened with quadratic curves (used for the hexagon + triangle bots)
+function roundedPoly(pts, r) {
+  const n = pts.length; let d = '';
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n];
+    const u = (a, b) => { const dx = a[0] - b[0], dy = a[1] - b[1], l = Math.hypot(dx, dy); return [dx / l, dy / l, l]; };
+    const v1 = u(p0, p1), v2 = u(p2, p1), rr = Math.min(r, v1[2] / 2.2, v2[2] / 2.2);
+    const a = [p1[0] + v1[0] * rr, p1[1] + v1[1] * rr], b = [p1[0] + v2[0] * rr, p1[1] + v2[1] * rr];
+    d += (i ? 'L' : 'M') + a[0].toFixed(1) + ' ' + a[1].toFixed(1) + 'Q' + p1[0] + ' ' + p1[1] + ' ' + b[0].toFixed(1) + ' ' + b[1].toFixed(1);
+  }
+  return d + 'Z';
+}
+// Every shape is lopsided on purpose, so a mirrored / upside-down bot is readable from its outline alone.
+export const SHAPES = {
+  cloud: cloudPath(),                                                           // Twist
+  droplet: 'M68 7C70 28 86 44 84 63A34 34 0 0 1 16 63C16 43 56 37 68 7Z',       // Slide: a teardrop leaning right
+  hex: roundedPoly([[48, 8], [88, 24], [93, 70], [52, 93], [12, 77], [8, 29]], 11),   // Warp: an uneven hexagon
+  tri: roundedPoly([[38, 8], [93, 83], [9, 88]], 13),                           // Gate: a scalene triangle
+  pebble: pebblePath(),                                                         // blocks
+};

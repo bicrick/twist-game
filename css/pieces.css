@@ -28,6 +28,11 @@
 .piece.ghost.home.ok { --c: var(--okc); opacity: 1; }
 .piece.ghost.home.ok .cb { fill: color-mix(in srgb, var(--okc) 28%, transparent); }
 
+/* eyes sit differently in each bot's body */
+.sh-droplet .eye.l { left: 31%; top: 52%; } .sh-droplet .eye.r { left: 54%; top: 48%; }
+.sh-hex .eye.l { left: 30%; top: 43%; } .sh-hex .eye.r { left: 55%; top: 39%; }
+.sh-tri .eye.l { left: 32%; top: 55%; } .sh-tri .eye.r { left: 52%; top: 52%; }
+
 /* ---- blocks: little pebble bots ---- */
 .cb.pb { fill: url(#blkGrad); }
 .piece.blk { --c: var(--block); filter: drop-shadow(0 calc(var(--cell) * .05) calc(var(--cell) * .035) rgba(0,0,0,.45)); }

@@ -14,3 +14,10 @@
 #menu .pill { min-width: 0; padding: 4px 11px; border-radius: 99px; background: rgba(255,255,255,.1); color: var(--ink-soft); }
 #menu .pill.on { background: var(--okc); color: #fff; }
 html.reduce-motion #menu.on, html.reduce-motion #menu .card { animation: none; }
+
+/* short screens (small phones with the pad): tighter rows so the whole card fits */
+@media (max-height: 720px) {
+  #menu .card { padding: 14px 10px 10px; }
+  #menu h2 { margin: 0 12px 6px; font-size: 18px; }
+  #menu .row { padding: 8px 12px; font-size: 15px; }
+}

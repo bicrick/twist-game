@@ -10,22 +10,22 @@ html.with-pad #screen { border-radius: 12px; box-shadow: 0 0 0 2px #1d2a35; back
 /* portrait: screen on top, pad below */
 @media (orientation: portrait) {
   html.with-pad #screen { inset: 14px 14px calc(var(--pad-h) + 4px) 14px; }
-  html.with-pad { --pad-h: clamp(210px, 32vh, 290px); }
+  html.with-pad { --pad-h: clamp(176px, 26vh, 240px); }
   html.with-pad #pad { left: 0; right: 0; bottom: 0; height: var(--pad-h); }
   .dpad { left: max(6%, calc(50% - 210px)); top: 46%; transform: translateY(-62%); }
-  .abs { right: max(6%, calc(50% - 210px)); top: 46%; transform: translateY(-62%); }
-  .mid { left: 0; right: 0; bottom: max(16px, env(safe-area-inset-bottom)); justify-content: center; }
+  .acts { right: max(6%, calc(50% - 210px)); top: 42%; transform: translateY(-58%); }
+  html.with-pad .mid { left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); justify-content: center; }
 }
 /* landscape: screen in the middle, D-pad left, buttons right */
 @media (orientation: landscape) {
   html.with-pad #screen { inset: 10px var(--pad-side) 10px var(--pad-side); }
   html.with-pad #pad { inset: 0; pointer-events: none; }
   .dpad { left: calc(var(--pad-side) / 2); top: 50%; transform: translate(-50%, -58%); }
-  .abs { right: calc(var(--pad-side) / 2); top: 50%; transform: translate(50%, -58%); }
-  .mid { left: 0; right: 0; bottom: 14px; justify-content: space-between; padding: 0 calc(var(--pad-side) / 2 - 40px); }
+  .acts { right: calc(var(--pad-side) / 2); top: 50%; transform: translate(50%, -58%); }
+  html.with-pad .mid { left: 0; right: 0; bottom: 14px; justify-content: space-between; padding: 0 calc(var(--pad-side) / 2 - 44px); }
 }
 
-.dpad, .abs, .mid { position: absolute; pointer-events: auto; }
+.dpad, .acts, .mid { position: absolute; pointer-events: auto; }
 .dpad { width: calc(var(--pad-u) * 3); height: calc(var(--pad-u) * 3); touch-action: none; }
 .dpad .cross { position: absolute; inset: 0; pointer-events: none; }
 /* flat cross: four arms + a centre piece. Pressing slides that arm straight toward the centre (no tilt). */
@@ -47,16 +47,18 @@ html.with-pad #screen { border-radius: 12px; box-shadow: 0 0 0 2px #1d2a35; back
 .dpad[data-dir=up] .arm.up, .dpad[data-dir=down] .arm.down, .dpad[data-dir=left] .arm.left, .dpad[data-dir=right] .arm.right
   { background: var(--pad-key-hi); color: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.4); }
 
-.abs { width: calc(var(--pad-u) * 3); height: calc(var(--pad-u) * 2.2); }
-.abs .b { position: absolute; width: calc(var(--pad-u) * 1.4); height: calc(var(--pad-u) * 1.4); border-radius: 50%; border: 0; padding: 0;
-          color: #fff; font: 700 calc(var(--pad-u) * .5)/1 var(--font); touch-action: none;
-          box-shadow: 0 3px 0 rgba(0,0,0,.45); }
-.abs .b.a { right: 0; top: 0; background: var(--pad-a); }
-.abs .b.bb { left: 0; bottom: 0; background: var(--pad-b); }
-.abs .b:active, .abs .b.on { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.28); }
+/* action cluster: Reset on top, Undo / Redo below. Icon buttons; .dim = nothing to do right now */
+.acts { width: calc(var(--pad-u) * 3.1); height: calc(var(--pad-u) * 2.7); }
+.act { position: absolute; width: calc(var(--pad-u) * 1.35); height: calc(var(--pad-u) * 1.35); border: 0; padding: 0; border-radius: 34%; display: grid; place-items: center;
+       color: #fff; touch-action: none; box-shadow: 0 3px 0 rgba(0,0,0,.45); transition: opacity .15s ease, transform .06s ease; }
+.act svg { width: 52%; height: 52%; }
+.act.reset { left: 50%; top: 0; margin-left: calc(var(--pad-u) * -.675); background: #f59e0b; }
+.act.undo { left: 0; bottom: 0; background: var(--pad-a); }
+.act.redo { right: 0; bottom: 0; background: var(--pad-a); }
+.act:active, .act.on { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.45); }
+.act.dim { opacity: .28; box-shadow: none; }
 
-.mid { display: flex; gap: 26px; align-items: flex-start; }
-.mid .s { display: flex; flex-direction: column; align-items: center; gap: 13px; color: var(--pad-label); font: 700 9px/1 var(--font); letter-spacing: 1.4px; }
-.mid .s button { width: 40px; height: 12px; margin-top: 6px; border-radius: 2px; border: 0; padding: 0; background: var(--pad-key); transform: rotate(-22deg); touch-action: none;
-                 box-shadow: 0 2px 0 rgba(0,0,0,.4); }
-.mid .s button:active, .mid .s button.on { background: var(--pad-key-hi); transform: rotate(-22deg) translateY(1px); }
+/* bottom row: two ordinary buttons, side by side, no tilt */
+.mid { display: flex; gap: 12px; justify-content: center; align-items: center; }
+.pill { min-width: 84px; padding: 9px 20px; border: 0; border-radius: 13px; background: var(--pad-key); color: rgba(255,255,255,.85); font: 600 14px/1 var(--font); touch-action: none; box-shadow: 0 3px 0 rgba(0,0,0,.4); }
+.pill:active, .pill.on { background: var(--pad-key-hi); transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.4); }

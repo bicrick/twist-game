@@ -4,6 +4,7 @@ export default {
   sub: "portals link two places",
   icon: '<svg viewBox="0 0 24 24"><circle cx="7.2" cy="12" r="4.4" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="16.8" cy="12" r="4.4" fill="currentColor"/></svg>',
   hue: 345,
+  bot: { shape: 'hex', color: '#18c9a9' },   // this world's player (new behaviour = new guy)
   // level groups (state/progress.js): a group opens when the one before it is solved
   groups: [[0,1],[2,3],[4,5]],
   // Room map (see data/roommap.js): . floor  , trail  X back door  0-9a-z level index. Doors sit next to each other; adjacent cells are joined by a connector.

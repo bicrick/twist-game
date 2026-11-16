@@ -15,12 +15,15 @@ import { parseLevel, step, stepEvents, isWin, same, openGates } from '../engine/
 import { PORTAL_COLORS, ID_COLORS } from './palette.js';
 
 let wi = 0, li = 0, state = null, hist = [], dirs = [], prev = {}, panes = [], CELL = 64;
-let curDir = [0, 0], busy = false, completed = null, decor = [], prevOpen;
+let curDir = [0, 0], busy = false, completed = null, decor = [], prevOpen, redoStack = [];
+// the touch pad greys its Undo / Redo / Reset buttons from this
+export const hooks = { onHistory: () => {} };
+const notify = () => hooks.onHistory({ undo: !busy && hist.length > 0, redo: !busy && redoStack.length > 0, reset: !busy });
 
 export const isBusy = () => busy;
 export function start(w, l) {
-  wi = w; li = l; state = parseLevel(WORLDS[w].levels[l]); hist = []; dirs = []; prev = {}; busy = false;
-  build();
+  wi = w; li = l; state = parseLevel(WORLDS[w].levels[l]); hist = []; dirs = []; redoStack = []; prev = {}; busy = false;
+  build(); notify();
 }
 export const restart = () => { sfx.restart(); swap(() => start(wi, li), { dir: 'fade' }); };
 export const leave = () => { sfx.leave(); nav.world(wi, li); };
@@ -28,6 +31,12 @@ export const leave = () => { sfx.leave(); nav.world(wi, li); };
 // everything on the board that needs an element (empty floor needs none): walls, pads, portals, plates, gates
 function levelDecor(L) {
   const out = [], pair = new Map();
+  // is the cell beside (r,c) a wall? Solid edges count (so edge walls fuse with the rim); glued edges look across the seam.
+  const wallAt = (r, c) => {
+    if (c < 0 || c >= L.W) { if (L.lr === 'none') return true; return L.walls.has((L.lr === 'twist' ? L.H - 1 - r : r) + ',' + ((c + L.W) % L.W)); }
+    if (r < 0 || r >= L.H) { if (L.tb === 'none') return true; return L.walls.has(((r + L.H) % L.H) + ',' + (L.tb === 'twist' ? L.W - 1 - c : c)); }
+    return L.walls.has(r + ',' + c);
+  };
   let np = 0;
   for (const [k, d] of L.portals) {
     if (pair.has(k)) continue;
@@ -35,7 +44,7 @@ function levelDecor(L) {
   }
   for (let r = 0; r < L.H; r++) for (let c = 0; c < L.W; c++) {
     const k = r + ',' + c, e = { r, c, cls: [], pc: null, gid: null };
-    if (L.walls.has(k)) e.cls.push('wall');
+    if (L.walls.has(k)) { e.cls.push('wall'); if (wallAt(r - 1, c)) e.cls.push('wn'); if (wallAt(r + 1, c)) e.cls.push('ws'); if (wallAt(r, c - 1)) e.cls.push('ww'); if (wallAt(r, c + 1)) e.cls.push('we'); }
     if (L.pads.has(k)) e.cls.push('pad', L.pads.get(k));
     if (L.portals.has(k)) { const f = L.portals.get(k).flip; e.cls.push('portal'); if (f) e.cls.push('pf-' + f); e.pc = PORTAL_COLORS[pair.get(k) % PORTAL_COLORS.length]; }
     const pl = L.plates.find(p => p.r === r && p.c === c);
@@ -54,8 +63,8 @@ function addCells(root, gates) {
   }
 }
 function build() {
-  const L = state.L; theme(WORLDS[wi].hue);
-  CELL = levelCell();
+  const L = state.L; theme(WORLDS[wi].hue, WORLDS[wi].bot);
+  CELL = levelCell(wi);
   const st = $('stage'); st.innerHTML = ''; st.classList.remove('win', 'title-mode');
   st.style.setProperty('--cell', CELL + 'px'); st.style.margin = Math.round(CELL * LEVEL_MARGIN) + 'px';
   const big = Math.round(CELL * .8), small = Math.round(CELL * .88);
@@ -136,6 +145,14 @@ function update() {
   }
 }
 
+function checkWin() {
+  if (!isWin(state)) return;
+  busy = true; sfx.win(); notify();
+  const was = progress.worldDone(wi); progress.markDone(wi, li);
+  completed = !was && progress.worldDone(wi) ? wi : null;           // optional challenge levels never complete a world
+  $('stage').classList.add('win');
+  setTimeout(finish, 1100);
+}
 export function move(dr, dc) {
   if (busy) return;
   curDir = [dr, dc];
@@ -143,22 +160,20 @@ export function move(dr, dc) {
   if (!ns) { sfx.blocked(); return; }
   const ev = stepEvents(state, ns, dr, dc);
   const from = state.player;
-  hist.push(state); dirs.push(curDir); state = ns;
+  hist.push(state); dirs.push(curDir); redoStack.length = 0; state = ns;
   puff(panes[0].root, (from.c + .5) * CELL, (from.r + .5) * CELL, CELL, dr, dc);
   stepBot(panes[0].pl, dr, dc);
   (ev.wrapped ? sfx.wrap : ev.flipped ? sfx.flip : ev.pushed ? sfx.push : sfx.move)();
-  update();
-  if (isWin(state)) {
-    busy = true; sfx.win();
-    const was = progress.worldDone(wi); progress.markDone(wi, li);
-    completed = !was && progress.worldDone(wi) ? wi : null;           // optional challenge levels never complete a world
-    $('stage').classList.add('win');
-    setTimeout(finish, 1100);
-  }
+  update(); notify(); checkWin();
 }
 export function undo() {
   if (busy || !hist.length) return;
-  const d = dirs.pop(); curDir = [-d[0], -d[1]]; state = hist.pop(); sfx.undo(); update();
+  const d = dirs.pop(); redoStack.push({ s: state, d }); curDir = [-d[0], -d[1]]; state = hist.pop(); sfx.undo(); update(); notify();
+}
+export function redo() {
+  if (busy || !redoStack.length) return;
+  const r = redoStack.pop(); hist.push(state); dirs.push(r.d); curDir = r.d; state = r.s;
+  stepBot(panes[0].pl, r.d[0], r.d[1]); sfx.move(); update(); notify(); checkWin();
 }
 function finish() {
   busy = false;
@@ -170,4 +185,5 @@ function finish() {
   else nav.world(wi, li);                          // end of the main run, or a challenge: back to the room
 }
 export const rebuild = () => build();
+export const peek = () => ({ player: state.player, blocks: state.blocks, hist: hist.length, redo: redoStack.length });   // for tests
 export const debugSet = f => { state = f(state); update(); };

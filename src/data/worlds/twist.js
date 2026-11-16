@@ -4,6 +4,7 @@ export default {
   sub: "edges that flip you over",
   icon: '<svg viewBox="0 0 24 24"><path d="M3 7c6 0 12 10 18 10M3 17c6 0 12-10 18-10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>',
   hue: 268,
+  bot: { shape: 'cloud', color: '#2f7bff' },   // this world's player (new behaviour = new guy)
   // level groups (state/progress.js): a group opens when the one before it is solved
   groups: [[0,1,2,3],[4,5],[6,7],[8,9]],
   // Room map (see data/roommap.js): . floor  , trail  X back door  0-9a-z level index. Doors sit next to each other; adjacent cells are joined by a connector.

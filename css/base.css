@@ -39,4 +39,4 @@ body { background: var(--bg); transition: background .5s ease; font-family: var(
 #particles { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
 #particles .pt { position: absolute; top: 100%; border-radius: 26%; background: color-mix(in srgb, var(--wall) 20%, transparent); animation: ptRise 60s linear infinite; }
 @keyframes ptRise { to { transform: translateY(-120vh) rotate(30deg); } }
-#stage.title-mode ~ #particles, html.reduce-motion #particles { display: none; }
+html.reduce-motion #particles { display: none; }
