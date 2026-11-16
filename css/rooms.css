@@ -8,7 +8,7 @@
 .door.locked { filter: saturate(.25) brightness(.92); }
 .door.bump { animation: bump .25s ease; }
 @keyframes bump { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
-.door .glyph { position: absolute; left: 22%; top: 14%; width: 56%; height: 56%; color: #fff; filter: drop-shadow(0 2px 0 rgba(0,0,0,.2)); }
+.door .glyph { position: absolute; left: 27%; top: 9%; width: 46%; height: 46%; color: #fff; filter: drop-shadow(0 2px 0 rgba(0,0,0,.2)); }
 .door .name { position: absolute; left: 0; right: 0; top: 12%; text-align: center; font: 800 calc(var(--cell) * .2)/1 var(--font); text-shadow: 0 1px 0 rgba(0,0,0,.25); }
 .door .pips { position: absolute; left: 8%; right: 8%; bottom: 12%; display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; }
 .door .pips i { width: calc(var(--cell) * .09); height: calc(var(--cell) * .09); border-radius: 50%; background: rgba(255,255,255,.35); }
