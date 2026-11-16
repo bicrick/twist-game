@@ -1,8 +1,10 @@
-// Per-world colours. hue === null is the neutral hub palette.
+// Per-world colours: a dark tinted world, bright walls. hue === null is the hub (green).
 export function theme(h) {
+  if (h === null) h = 150;
   const b = document.body.style;
-  if (h === null) { b.setProperty('--bg', '#d9d2c5'); b.setProperty('--floor', '#ece6da'); b.setProperty('--wall', '#8a8171'); return; }
-  b.setProperty('--bg', `hsl(${h} 34% 70%)`);
-  b.setProperty('--floor', `hsl(${h} 38% 86%)`);
-  b.setProperty('--wall', `hsl(${h} 18% 52%)`);
+  b.setProperty('--bg', `hsl(${h} 50% 7%)`);
+  b.setProperty('--floor', `hsl(${h} 42% 14%)`);
+  b.setProperty('--wall', `hsl(${h} 78% 52%)`);
+  b.setProperty('--wall-shade', `hsl(${h} 70% 36%)`);
+  b.setProperty('--trail', `hsl(${h} 38% 24%)`);
 }

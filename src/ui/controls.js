@@ -6,6 +6,8 @@ import { $, el } from './dom.js';
 const ARROW = '<svg viewBox="0 0 24 24"><path d="M12 6 5 17h14z" fill="currentColor"/></svg>';
 const ROT = { up: 0, right: 90, down: 180, left: 270 };
 const DIR = { up: [-1, 0], down: [1, 0], left: [0, -1], right: [0, 1] };
+// light haptic tick, only once the page has had a real tap (browsers block it before that)
+const buzz = () => { if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(8); };
 const wantsPad = () => matchMedia('(pointer: coarse)').matches || innerWidth < 640 || /[?&]pad=1/.test(location.search);
 
 export function initControls(h) {
@@ -18,20 +20,19 @@ export function initControls(h) {
     const stop = () => { clearTimeout(t); clearInterval(t); node.classList.remove('on'); };
     node.addEventListener('pointerdown', e => {
       e.preventDefault(); node.setPointerCapture(e.pointerId); node.classList.add('on');
-      h.gesture(); navigator.vibrate && navigator.vibrate(8); fn();
+      h.gesture(); buzz(); fn();
       if (repeat) t = setTimeout(() => { t = setInterval(fn, 150); }, 380);
     });
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => node.addEventListener(ev, stop));
   }
 
-  // One cross that rocks toward the pressed direction. A single surface reads the thumb position,
+  // A flat cross: the pressed arm slides straight in under the centre. A single surface reads the thumb position,
   // so sliding between arms switches direction without lifting, like a real D-pad.
   const dpad = el('dpad', pad), cross = el('cross', dpad);
   for (const d of Object.keys(DIR)) {
     const arm = el('arm ' + d, cross); arm.innerHTML = ARROW; arm.firstChild.style.transform = `rotate(${ROT[d]}deg)`;
   }
-  el('shade', cross);
-  el('dimple', cross);
+  el('center', cross).appendChild(el('dimple'));
   let cur = null, timer = 0, active = false;
   const hold = fn => { clearTimeout(timer); clearInterval(timer); timer = setTimeout(() => { timer = setInterval(fn, 150); }, 380); };
   const setDir = d => {
@@ -39,7 +40,7 @@ export function initControls(h) {
     cur = d; clearTimeout(timer); clearInterval(timer);
     if (d) dpad.dataset.dir = d; else delete dpad.dataset.dir;
     if (!d) return;
-    navigator.vibrate && navigator.vibrate(8);
+    buzz();
     const fire = () => h.dir(...DIR[d]); fire(); hold(fire);
   };
   const dirAt = e => {

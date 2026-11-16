@@ -27,10 +27,13 @@ Controls are WASD/arrows, `z` undo, `r` restart, `Esc`/`m` back, `n` mute. On to
 - `lib.js`: `solve(def,maxStates)` BFS solver on the real engine. `gen.js '<cfg json>' <seed>` generates levels by scrambling a solved state; `genall.js` runs all tiers.
 - `paths.js` writes `tools/paths.json` (solutions); replay them through real key events in the browser after changing levels or the engine. `archive/` is history, not maintained.
 
-## Design preferences (from the user)
-Parabox-like flat pastel look; no instruction sidebars; no gridlines; walls are irregular rounded stones; blocks are bananas (orientation visible via ghost outline; no red error tooltips); player has no ear/blob; matched targets glow green. Keep styling simple and centralized (CSS tokens) so it is easy to change later. Wants "handshake" puzzles solved by reasoning backwards, not brute force.
-Menu rooms look like levels (twisted seams + mirrored reflections); the seams are decorative only. World 1 has 10 levels, keep worlds short.
-World rooms are ASCII maps (`map` in each world file, parsed by `src/data/roommap.js`): `#` stone, `.` floor, `,` trail, `S` start, `X` back door, `0-9a-z` level index. Group levels into sections/branches with trails; `npm test` checks every level appears once and every door is reachable.
+## Design (Patrick's Parabox look; user wants this direction, restyle freely from the tokens)
+- Flat fills only, black outlines + hard offset shadows, NO gradients/glows/blur/vignette. Zero corner radius in the game world (boards, walls, pieces, doors, goals); only the touch pad may round (`--r-ui`, A/B circles).
+- Palette (tokens in `css/base.css`, per-world hues in `ui/theme.js` + `hue` in each world file): dark tinted world (`--bg`, `--floor`), bright walls with a darker band underneath (`--wall`, `--wall-shade`), player orange-red, blocks (bananas) yellow, goals = solid outlines of what belongs there turning green (`--okc`) when matched, seams mint (plain) / amber (twist) hairlines, mirror pads cyan. Hub is green, Twist blue (205), Mirror violet (285).
+- Text only appears in `#top`, directly above the current board (title left, target squares right, banners above). No hint text, no instruction sidebars.
+- Level doors are flat boxes with a thumbnail (canvas image, `ui/preview.js`) and a tick; world rooms are clean (no stones, no gridlines), maps get a 1-cell margin so nothing touches the border.
+- Finishing a level moves straight on to the next one in the world (last level -> room, or hub + banner if the world is newly complete).
+- Wants "handshake" puzzles solved by reasoning backwards, not brute force. Keep styling simple and centralized.
 
 ## Performance rules
 - Reflections are decoration: max 15 panes (`MAX_PANES` in board.js), no blur/filters/shadows inside `.copy`. Move pieces with `transform`, never `left/top`. Avoid forced reflows (`offsetWidth`) per piece.

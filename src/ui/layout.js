@@ -3,7 +3,7 @@
 // and only shrink when they cannot fit.
 import { WORLDS } from '../data/worlds.js';
 
-const MAX = 80, MIN = 24, LEVEL_PAD = 1.8;
+const MAX = 104, MIN = 24, LEVEL_PAD = 1.8;
 let maxW = 0, maxH = 0;
 WORLDS.forEach(w => w.levels.forEach(l => { maxW = Math.max(maxW, l.w); maxH = Math.max(maxH, l.h); }));
 
@@ -12,5 +12,7 @@ export const screenSize = () => { const s = document.getElementById('screen'); r
 const fit = (W, H) => { const [w, h] = screenSize(); return Math.floor(Math.min((w - 40) / W, (h - 130) / H)); };
 export const baseCell = () => Math.max(MIN, Math.min(MAX, fit(maxW + LEVEL_PAD, maxH + LEVEL_PAD)));
 export const levelCell = baseCell;
-export const roomCell = (W, H) => Math.max(MIN, Math.min(baseCell(), fit(W, H)));
+// rooms leave a margin so the reflections around them are visible (less of it on small screens)
+const roomFit = (W, H) => { const [w, h] = screenSize(), k = w < 700 ? .94 : .8; return Math.floor(Math.min(w * k / W, (h - 110) * k / H)); };
+export const roomCell = (W, H) => Math.max(MIN, Math.min(baseCell(), roomFit(W, H)));
 export const LEVEL_MARGIN = .3;

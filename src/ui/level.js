@@ -4,16 +4,15 @@ import { createBoard } from './board.js';
 import { piece, orient } from './pieces.js';
 import { theme } from './theme.js';
 import { banner, hideBanner } from './banner.js';
+import { setTitle } from './hud.js';
 import { levelCell, LEVEL_MARGIN } from './layout.js';
 import { nav } from './nav.js';
-import { swap } from './transition.js';
+import { swap, whenIdle } from './transition.js';
 import { sfx } from '../audio/sfx.js';
 import { WORLDS } from '../data/worlds.js';
 import * as progress from '../state/progress.js';
 import { parseLevel, step, stepEvents, isWin, same } from '../engine/engine.js';
 
-const RADS = ['38% 24% 34% 28% / 30% 38% 26% 36%', '26% 36% 28% 40% / 38% 26% 36% 28%',
-              '32% 30% 40% 24% / 26% 40% 28% 34%', '24% 40% 26% 34% / 36% 28% 38% 30%'];
 let wi = 0, li = 0, state = null, hist = [], dirs = [], prev = {}, panes = [], CELL = 64;
 let curDir = [0, 0], busy = false, completed = null;
 
@@ -28,8 +27,9 @@ export const leave = () => { sfx.leave(); nav.world(wi, li); };
 function addCells(root, L) {
   for (let r = 0; r < L.H; r++) for (let c = 0; c < L.W; c++) {
     const wall = L.walls.has(r + ',' + c), pd = L.pads.get(r + ',' + c);
+    if (!wall && !pd) continue;                       // empty floor needs no element
     const d = el('cell' + (wall ? ' wall' : '') + (pd ? ' pad ' + pd : ''), root);
-    if (wall) d.style.setProperty('--rad', RADS[(r * 3 + c * 5 + r * c) % 4]);
+    d.style.left = c * CELL + 'px'; d.style.top = r * CELL + 'px';
   }
 }
 function build() {
@@ -49,8 +49,7 @@ function build() {
   L.targets.forEach(() => dd.appendChild(document.createElement('i')));
   const hd = document.createElement('i'); hd.className = 'home'; dd.appendChild(hd);
   prev = {}; update(true);
-  $('chip').textContent = WORLDS[wi].name + ' ' + (li + 1);
-  $('hint').textContent = 'WASD move  ·  Z undo  ·  R restart  ·  Esc menu';
+  setTitle(WORLDS[wi].name + ' ' + (li + 1));
 }
 
 const at = (n, x, y) => { n.style.transform = `translate(${x}px, ${y}px)`; };
@@ -123,12 +122,13 @@ export function undo() {
 }
 function finish() {
   busy = false;
-  if (completed !== null) {
+  if (completed !== null) {                       // that was the last missing level of the world
     const w = completed; completed = null; nav.hub(w);
     const nx = WORLDS[w + 1];
     sfx.unlocked();
-    banner(WORLDS[w].name + ' complete', nx ? nx.name + ' is unlocked' : 'That is every world, for now', 5000);
-  } else nav.world(wi, li);
+    whenIdle(() => banner(WORLDS[w].name + ' complete', nx ? nx.name + ' is unlocked' : 'That is every world, for now', 5000));
+  } else if (li + 1 < WORLDS[wi].levels.length) nav.level(wi, li + 1);   // carry straight on to the next one
+  else nav.world(wi, li);                          // end of the world: back to its room
 }
 export const rebuild = () => build();
 export const debugSet = f => { state = f(state); update(); };

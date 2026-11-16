@@ -1,16 +1,16 @@
-/* The board: floor, cells, seams, reflected copies. Shared by levels and rooms. */
-#floor { position: relative; display: grid; background: var(--floor); border-radius: var(--radius);
-         box-shadow: 0 10px 0 rgba(0,0,0,.12); transition: background .5s ease; }
-.copy { position: absolute; z-index: 1; display: grid; background: var(--floor); border-radius: var(--radius); transition: background .5s ease; }
-.cell { position: relative; }
-.cell.wall::before { content: ''; position: absolute; inset: 7%; background: var(--wall); border-radius: var(--rad);
-  box-shadow: inset 0 4px 0 rgba(255,255,255,.14), 0 4px 0 rgba(0,0,0,.12); }
-.cell.pad::after { content: ''; position: absolute; inset: 11%; border-radius: 18%; background: color-mix(in srgb, var(--padc) 30%, transparent);
-  border: 3px solid color-mix(in srgb, var(--padc) 70%, transparent); display: flex; align-items: center; justify-content: center;
-  font: 800 calc(var(--cell) * .42)/1 var(--font); color: var(--padc); }
+/* The board: floor, walls, pads, seams, reflected copies. Shared by levels and rooms. */
+#floor { position: relative; background: var(--floor); box-shadow: 0 0 0 var(--b) var(--outline); transition: background .5s ease; }
+.copy { position: absolute; z-index: 1; background: var(--floor); box-shadow: 0 0 0 var(--b) var(--outline); transition: background .5s ease; contain: layout style; }
+.cell { position: absolute; width: var(--cell); height: var(--cell); }
+/* walls: bright flat tile with a darker band underneath; neighbours merge into one slab */
+.cell.wall::before { content: ''; position: absolute; inset: 0; background: var(--wall); box-shadow: inset 0 calc(var(--cell) * -.16) 0 var(--wall-shade); }
+.cell.pad::after { content: ''; position: absolute; inset: 14%; background: color-mix(in srgb, var(--padc) 16%, transparent);
+  border: var(--b) solid var(--padc); display: flex; align-items: center; justify-content: center;
+  font: 800 calc(var(--cell) * .4)/1 var(--font); color: var(--padc); }
 .cell.pad.x::after { content: '\2194'; } .cell.pad.y::after { content: '\2195'; }
 
-.edge { position: absolute; z-index: 6; pointer-events: none; border-radius: 4px; }
-.edge.plain { background: var(--plain); box-shadow: 0 0 14px var(--plain); }
-.edge.twist { background: var(--twist); box-shadow: 0 0 14px var(--twist); }
-.edge.none { background: var(--wall); opacity: .85; }
+/* seams: hairlines only */
+.edge { position: absolute; z-index: 6; pointer-events: none; opacity: .6; }
+.edge.plain { background: var(--plain); }
+.edge.twist { background: var(--twist); }
+.edge.none { background: var(--outline); opacity: 1; }

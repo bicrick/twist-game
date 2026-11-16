@@ -3,19 +3,18 @@ export default {
   name: "Mirror",
   sub: "floors that flip you over",
   icon: '<svg viewBox="0 0 24 24"><path d="M12 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 3.6" fill="none"/><path d="M9.5 7 3.5 18h6z" fill="currentColor"/><path d="M14.5 7l6 11h-6z" fill="currentColor" opacity=".5"/></svg>',
-  hue: 335,
+  hue: 285,
   intro: "Mirror pads flip whatever steps onto them — you, or the thing you push.",
-  // Room map (see ui/rooms.js): # stone  . floor  , trail  S start  X back door  0-9a-z level index
+  // Room map (see ui/rooms.js): . floor  , trail  S start  X back door  0-9a-z level index
   map: [
     '..a.9.8....',
     ',,,,,,,....',
-    ',.....,.#..',
-    '7..##.5.##.',
-    ',..##.,.##.',
+    ',.....,....',
+    '7.....5....',
+    ',.....,....',
     '6,,,,,4....',
-    '#..,.......',
-    '#..3,2,1,0.',
-    '.........SX',
+    '..,........',
+    '..3,2,1,0SX',
   ],
   levels: [
   {"w":5,"h":1,"lr":"none","tb":"none","walls":[],"pads":[[0,2,"x"]],"player":[0,0],"blocks":[[0,1]],"targets":[[0,3,1,0]],"home":[0,2,1,0]},

@@ -1,28 +1,21 @@
-/* Menu rooms (hub + world): same board as a level, with doors instead of pieces. */
-.door { position: absolute; border-radius: 12%; z-index: 4; box-shadow: var(--lift); overflow: hidden;
-        display: flex; align-items: center; justify-content: center; color: #fff; }
-.door .num { position: absolute; left: 6%; top: 3%; font: 800 calc(var(--cell) * .2)/1 var(--font); color: rgba(255,255,255,.95); z-index: 3; text-shadow: 0 1px 0 rgba(0,0,0,.25); }
-.door .tick { position: absolute; right: 5%; top: 5%; width: 26%; height: 26%; border-radius: 50%; background: var(--home); color: #fff;
-              font: 800 calc(var(--cell) * .17)/1 var(--font); display: flex; align-items: center; justify-content: center; z-index: 3; }
-.door.exit { border-radius: 50%; }
-.door.locked { filter: saturate(.25) brightness(.92); }
+/* Menu rooms: the hub (worlds) and a world room (levels). Doors are little boxes. */
+.door { position: absolute; z-index: 4; display: flex; align-items: center; justify-content: center; color: #fff;
+        box-shadow: 0 0 0 var(--b) var(--outline), calc(var(--b) * 1.6) calc(var(--b) * 1.6) 0 var(--b) rgba(0,0,0,.4); }
+.door .num { position: absolute; left: 6%; top: 4%; z-index: 3; font: 800 calc(var(--cell) * .2)/1 var(--font); color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,.6); }
+.door .tick { position: absolute; right: 6%; top: 6%; width: 24%; height: 24%; background: var(--okc); color: #052b14; border: calc(var(--b) * .7) solid #000;
+              font: 800 calc(var(--cell) * .16)/1 var(--font); display: flex; align-items: center; justify-content: center; z-index: 3; }
+.door.exit { background: var(--trail); }
+.door.exit .icon { width: 56%; height: 56%; color: #fff; }
+.door.locked { background: #2a2f35 !important; }
 .door.bump { animation: bump .25s ease; }
 @keyframes bump { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
-.door .glyph { position: absolute; left: 27%; top: 9%; width: 46%; height: 46%; color: #fff; filter: drop-shadow(0 2px 0 rgba(0,0,0,.2)); }
-.door .name { position: absolute; left: 0; right: 0; top: 12%; text-align: center; font: 800 calc(var(--cell) * .2)/1 var(--font); text-shadow: 0 1px 0 rgba(0,0,0,.25); }
-.door .pips { position: absolute; left: 8%; right: 8%; bottom: 12%; display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; }
-.door .pips i { width: calc(var(--cell) * .09); height: calc(var(--cell) * .09); border-radius: 50%; background: rgba(255,255,255,.35); }
+.door .glyph { position: absolute; left: 27%; top: 9%; width: 46%; height: 46%; color: #fff; }
+.door .pips { position: absolute; left: 8%; right: 8%; bottom: 10%; display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; }
+.door .pips i { width: calc(var(--cell) * .09); height: calc(var(--cell) * .09); background: rgba(0,0,0,.35); }
 .door .pips i.on { background: #fff; }
-.door .lock { position: absolute; left: 50%; top: 60%; width: 34%; height: 34%; transform: translate(-50%, -50%); color: rgba(0,0,0,.5); }
-.mini { position: relative; display: grid; border-radius: 3px; }
-.mini i { display: block; }
+.door .lock { position: absolute; left: 50%; top: 50%; width: 38%; height: 38%; transform: translate(-50%, -50%); color: rgba(255,255,255,.45); }
+.mini { background-size: 100% 100%; box-shadow: 0 0 0 calc(var(--b) * .6) #000; }
 
-/* world-room map: trail segments, back door */
-.cell.trail::before { content: ''; position: absolute; left: 50%; top: 50%; width: 22%; height: 22%; transform: translate(-50%, -50%);
-                      border-radius: 50%; background: color-mix(in srgb, var(--wall) 20%, transparent); }
-.cell .seg { position: absolute; background: color-mix(in srgb, var(--wall) 20%, transparent); }
-.cell .seg.n { left: 39%; width: 22%; top: 0; height: 50%; }
-.cell .seg.s { left: 39%; width: 22%; top: 50%; bottom: 0; }
-.cell .seg.w { top: 39%; height: 22%; left: 0; width: 50%; }
-.cell .seg.e { top: 39%; height: 22%; left: 50%; right: 0; }
-.door.exit .icon { width: 56%; height: 56%; color: #fff; }
+/* world-room map */
+.trails { position: absolute; left: 0; top: 0; pointer-events: none; }
+.trails path { fill: none; stroke: var(--trail); stroke-linecap: butt; stroke-linejoin: miter; }

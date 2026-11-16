@@ -5,10 +5,13 @@
 //   dir 'fade' same screen rebuilt (restart, resize): quick cross-fade
 //   first      initial load: only the fade-in
 import { $ } from './dom.js';
+import { placeTop } from './hud.js';
 
 const OUT = { in: 220, out: 200, fade: 110 }, IN = { in: 320, out: 300, fade: 170 };
-let busy = false, pending = null;
+let busy = false, pending = null, idle = [];
 export const isBusy = () => busy;
+// run once no screen change is in flight (e.g. show a banner only after the new screen is up)
+export const whenIdle = fn => { if (busy) idle.push(fn); else fn(); };
 
 export function swap(build, { dir = 'fade', origin = null, first = false } = {}) {
   if (busy) { pending = [build, { dir: 'fade' }]; return; }
@@ -18,7 +21,7 @@ export function swap(build, { dir = 'fade', origin = null, first = false } = {})
 
   const reveal = () => {
     st.classList.add('building');                       // no transitions while it is constructed
-    build();
+    build(); placeTop();
     st.style.transition = 'none'; st.style.transformOrigin = '50% 50%';
     st.style.opacity = 0; st.style.transform = `scale(${inScale})`;
     void st.offsetWidth;
@@ -29,6 +32,7 @@ export function swap(build, { dir = 'fade', origin = null, first = false } = {})
     setTimeout(() => {
       st.style.transition = ''; st.style.transform = '';
       busy = false;
+      idle.splice(0).forEach(f => f());
       if (pending) { const [b, o] = pending; pending = null; swap(b, o); }
     }, IN[dir] + 20);
   };

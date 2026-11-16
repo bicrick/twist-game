@@ -1,42 +1,34 @@
-/* Player, blocks (bananas) and their target ghosts. */
-.piece { position: absolute; left: 0; top: 0; border-radius: 13%; background: var(--c); z-index: 5;
-         box-shadow: 0 4px 0 rgba(0,0,0,.2); transition: transform .12s ease, opacity .12s ease; }
+/* Player, blocks (bananas) and goal outlines. Flat fills, black outline, hard offset shadow. */
+.piece { position: absolute; left: 0; top: 0; background: var(--c); z-index: 5; transition: transform .12s ease, opacity .12s ease;
+         box-shadow: 0 0 0 var(--b) var(--outline), calc(var(--b) * 1.6) calc(var(--b) * 1.6) 0 var(--b) rgba(0,0,0,.4); }
 .piece .face { position: absolute; inset: 0; transition: transform .22s ease; }
 .piece.player { --c: var(--player); }
-.piece.blk { --c: var(--block); background: transparent; box-shadow: none; filter: drop-shadow(0 5px 0 rgba(0,0,0,.17)); }
-.eye { position: absolute; top: 22%; width: 24%; height: 26%; background: #fff; border-radius: 50%; }
-.eye.l { left: 20%; } .eye.r { left: 56%; }
-.eye::after { content: ''; position: absolute; right: 8%; top: 28%; width: 50%; height: 50%; background: #1d1d1d; border-radius: 50%; }
-.cheek { position: absolute; right: 14%; bottom: 16%; width: 30%; height: 13%; border-radius: 99px; background: rgba(0,0,0,.2); }
+.eye { position: absolute; top: 26%; width: 17%; height: 17%; background: #111; border-radius: 50%; }
+.eye.l { left: 24%; } .eye.r { left: 59%; }
+.cheek { position: absolute; right: 14%; bottom: 14%; width: 26%; height: 12%; background: rgba(0,0,0,.28); }
+
+.piece.blk { --c: var(--block); background: transparent; box-shadow: none; filter: drop-shadow(calc(var(--b) * 1.4) calc(var(--b) * 1.6) 0 rgba(0,0,0,.4)); }
 .piece.blk .face { display: flex; align-items: center; justify-content: center; }
 .piece.blk .face svg { width: 100%; height: 100%; padding: 2%; overflow: visible; }
-.bb { fill: #ffd84a; stroke: #c99700; stroke-width: 3.5; stroke-linejoin: round; }
-.bs { fill: #7a4b1d; } .bt { fill: #5a3714; }
+.bb { fill: var(--block); stroke: #000; stroke-width: 5; stroke-linejoin: miter; }
+.bs { fill: #3a2a12; } .bt { fill: #000; }
 
-/* ghosts: dashed outlines of where a block / the player must end up */
-.piece.ghost { background: color-mix(in srgb, var(--c) 13%, transparent); border: 3px dashed var(--c); box-shadow: none; z-index: 2;
-  transition: transform .12s ease, background .25s ease, border-color .25s ease, box-shadow .25s ease; }
-.piece.ghost.blk { --c: var(--block); border: none; background: none; border-radius: 50%; filter: none; }
+/* goals: solid outline of what must end up there; turns green when matched */
+.piece.ghost { --c: var(--block); background: transparent; box-shadow: inset 0 0 0 var(--b) var(--c); z-index: 2; transition: transform .12s ease, background .2s ease, box-shadow .2s ease; }
 .piece.ghost.home { --c: var(--home); }
-.piece.ghost .face { opacity: .8; }
-.piece.ghost .eye { background: rgba(255,255,255,.92); box-shadow: inset 0 0 0 2.5px var(--c); }
-.piece.ghost .eye::after { background: var(--c); }
+.piece.ghost .eye { background: var(--c); }
 .piece.ghost .cheek { background: var(--c); opacity: .55; }
-.piece.ghost.blk .bb { fill: color-mix(in srgb, var(--c) 16%, transparent); stroke: var(--c); stroke-width: 4.5; stroke-dasharray: 7 5; }
-.piece.ghost.blk .face svg { transform: scale(1.16); }
-.piece.ghost.blk .bs, .piece.ghost.blk .bt { fill: var(--c); opacity: .75; }
-.piece.ghost.ok { --c: var(--okc); border-style: solid; background: color-mix(in srgb, var(--okc) 30%, transparent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--okc) 28%, transparent), 0 0 22px color-mix(in srgb, var(--okc) 70%, transparent); }
-.piece.ghost.blk.ok { border: 0; background: none; box-shadow: none; filter: drop-shadow(0 0 9px var(--okc)); }
-.piece.ghost.blk.ok .bb { fill: color-mix(in srgb, var(--okc) 32%, transparent); stroke-dasharray: none; }
-.piece.ghost.pinging::after { content: ''; position: absolute; inset: -3px; border: 4px solid var(--okc); border-radius: inherit;
-  animation: ping .65s ease-out forwards; pointer-events: none; }
-@keyframes ping { from { transform: scale(1); opacity: .9; } to { transform: scale(1.7); opacity: 0; } }
-@keyframes pulse { 0% { transform: scale(1); } 40% { transform: scale(1.035); } 100% { transform: scale(1); } }
-.win #floor { animation: pulse .6s ease; }
+.piece.ghost.ok { --c: var(--okc); background: color-mix(in srgb, var(--okc) 28%, transparent); }
+.piece.ghost.blk { box-shadow: none; filter: none; background: none; }
+.piece.ghost.blk .bb { fill: color-mix(in srgb, var(--c) 14%, transparent); stroke: var(--c); stroke-width: 4; }
+.piece.ghost.blk .bs, .piece.ghost.blk .bt { fill: var(--c); opacity: .8; }
+.piece.ghost.blk.ok .bb { fill: color-mix(in srgb, var(--okc) 40%, transparent); }
+.piece.ghost.pinging::after { content: ''; position: absolute; inset: -3px; border: var(--b) solid var(--okc); animation: ping .5s ease-out forwards; pointer-events: none; }
+@keyframes ping { from { transform: scale(1); opacity: .9; } to { transform: scale(1.5); opacity: 0; } }
+@keyframes pulse { 0% { transform: scale(1); } 40% { transform: scale(1.03); } 100% { transform: scale(1); } }
+.win #floor { animation: pulse .5s ease; }
 
-/* reflections are decoration: keep them cheap (no shadows/filters), and isolate their layout */
-.copy { contain: layout style; }
-.copy .piece, .copy .piece.player { box-shadow: none; }
-.copy .piece.blk { filter: none; }
-.copy .piece.ghost.ok { box-shadow: none; }
+/* reflections are decoration: keep them cheap (no shadows/filters) */
+.copy .piece, .copy .piece.player { box-shadow: 0 0 0 var(--b) var(--outline); }
+.copy .piece.blk, .copy .piece.ghost.blk { filter: none; box-shadow: none; }
+.copy .piece.ghost { box-shadow: inset 0 0 0 var(--b) var(--c); }
