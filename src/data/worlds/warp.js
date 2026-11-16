@@ -1,5 +1,5 @@
 // World: Warp. Level format is documented in CLAUDE.md. Levels flagged challenge are optional (listed last).
-// 1-3 teach the mechanic (nothing else on the board, then one block, then a small puzzle); the rest ramp up.
+// 1-7: one portal pair, teaching step by step (nothing else, then a block, then small puzzles); 8 is the first two-pair level.
 export default {
   name: "Warp",
   sub: "portals link two places",
@@ -7,19 +7,21 @@ export default {
   hue: 345,
   bot: { shape: 'hex',color: '#18c9a9' },   // this world's player (new behaviour = new guy)
   // level groups (state/progress.js): a group opens when the one before it is solved
-  groups: [[0,1],[2,3],[4,5]],
+  groups: [[0,1,2],[3,4],[5,6,7]],
   // Room map (see data/roommap.js): . floor  , trail  X back door  0-9a-z level index. Doors sit next to each other; adjacent cells are joined by a connector.
   map: [
-    "X01.",
-    "..,.",
-    "432.",
-    ",...",
-    "5678",
+    "X012",
+    "...3",
+    "7654",
+    "8...",
+    "9a..",
   ],
   levels: [
   {"w":5,"h":3,"lr":"none","tb":"none","walls":[[0,2],[1,2],[2,2]],"portals":[[1,1,1,3]],"player":[1,0,0,0],"home":[0,4,0,0],"blocks":[],"targets":[]},
   {"w":6,"h":3,"lr":"none","tb":"none","walls":[[0,3],[1,3],[2,3]],"portals":[[1,2,1,4]],"player":[1,0,0,0],"home":[2,4,0,0],"blocks":[[1,1,0,0]],"targets":[[1,5,0,0]]},
+  {"w":5,"h":3,"lr":"none","tb":"none","walls":[[1,0],[0,4],[2,3]],"player":[1,3,0,0],"home":[0,2,0,0],"blocks":[[1,2,0,0]],"targets":[[2,0,0,0]],"portals":[[0,1,2,2]]},
   {"w":4,"h":3,"lr":"none","tb":"none","walls":[[1,3],[1,0]],"player":[0,1,0,0],"home":[0,0,0,0],"blocks":[[1,2,0,0]],"targets":[[2,1,0,0]],"portals":[[2,2,0,2]]},
+  {"w":5,"h":3,"lr":"none","tb":"none","walls":[[0,3],[2,1],[2,4]],"player":[0,1,0,0],"home":[1,4,0,0],"blocks":[[1,2,0,0]],"targets":[[1,0,0,0]],"portals":[[1,1,1,3]]},
   {"w":5,"h":3,"lr":"none","tb":"none","walls":[[2,0],[0,4],[1,0]],"player":[2,1,0,0],"home":[0,2,0,0],"blocks":[[2,2,0,0]],"targets":[[2,4,0,0]],"portals":[[0,3,2,3]]},
   {"w":5,"h":4,"lr":"none","tb":"none","walls":[[0,3],[1,3],[1,0]],"player":[3,1,0,0],"home":[2,4,0,0],"blocks":[[1,2,0,0]],"targets":[[2,0,0,0]],"portals":[[2,3,2,1]]},
   {"w":5,"h":4,"lr":"none","tb":"none","walls":[[3,4],[1,3],[1,1],[0,3]],"player":[3,3,0,0],"home":[2,0,0,0],"blocks":[[2,1,0,0]],"targets":[[2,3,0,0]],"portals":[[1,0,0,1],[0,2,2,2]]},

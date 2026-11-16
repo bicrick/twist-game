@@ -69,15 +69,13 @@ function build(spec) {
 function place() { players.forEach(p => { p.style.left = pos[1] * cell + cell * .12 + 'px'; p.style.top = pos[0] * cell + cell * .12 + 'px'; }); }
 const bump = d => d.nodes.forEach(n => { n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); });
 
-// The hub is a 2-column grid of world doors inside a one-cell margin; you walk around the ring of free cells.
-const HUB_COLS = 2;
+// The hub is a compact 3x3 crossroads: a world door in each corner, a plus-shaped trail, you start in the centre.
+const CORNERS = [[0, 0], [0, 2], [2, 0], [2, 2]], EDGES = [[0, 1], [1, 0], [1, 2], [2, 1]];
 export function showHub(from) {
-  const n = WORLDS.length, rows = Math.ceil(n / HUB_COLS), H = rows + 2, W = HUB_COLS + 2;
-  const spot = i => [1 + Math.floor(i / HUB_COLS), 1 + (i % HUB_COLS)];
-  // start on the bottom edge; coming back, stand beside the door you left (left or right margin)
-  pos = from == null ? [H - 1, 1] : [spot(from)[0], (from % HUB_COLS) ? W - 1 : 0];
+  // coming back, stand on the edge cell beside the door you left
+  pos = from == null ? [1, 1] : [CORNERS[from][0], 1];
   const doors = WORLDS.map((w, i) => {
-    const open = progress.worldOpen(i), [r, c] = spot(i);
+    const open = progress.worldOpen(i), [r, c] = CORNERS[i];
     return {
       r, c, cls: open ? '' : 'locked', color: `hsl(${w.hue} 85% 56%)`,
       fill(b) {
@@ -94,8 +92,9 @@ export function showHub(from) {
       },
     };
   });
+  const path = new Set([[1, 1], ...EDGES].map(([r, c]) => r + ',' + c));
   room = null;
-  build({ W, H, hue: null, doors });
+  build({ W: 3, H: 3, hue: null, doors, map: { m: { walls: new Set(), path } } });
   room.mode = 'hub'; announce('Choose a world');
 }
 

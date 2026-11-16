@@ -1,7 +1,7 @@
 // Random search for levels of any mechanic, verified by the BFS solver. Time-boxed.
 // Usage: node tools/gen_level.js '<cfg json>' <seed>   (prints the best few as JSON)
 // cfg: { w:[a,b], h:[a,b], lr:[..], tb:[..], walls:[a,b], blocks:n, flipGoals:bool, slide:bool,
-//        pairs:n (portal pairs), flipPortal:0..1, ids:n (plate+gate pairs), len:[a,b], minPushes:n, minUse:n, secs:n, keep:n }
+//        needPortal:bool (reject levels solvable about as fast without the portal), pairs:n (portal pairs), flipPortal:0..1, ids:n (plate+gate pairs), len:[a,b], minPushes:n, minUse:n, secs:n, keep:n }
 import { solve, flips, api } from './lib.js';
 const cfg = JSON.parse(process.argv[2]); let seed = +process.argv[3] || 1;
 const rnd = () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296;
@@ -35,6 +35,7 @@ while (Date.now() < until) {
     s = n;
   }
   if (pushes < (cfg.minPushes || 0) || use < (cfg.minUse || 0)) continue;
+  if (cfg.needPortal && portals.length) { const np = solve({ ...def, portals: undefined }, cfg.states || 60000); if (np && np.len >= 0 && np.len <= r.len + 1) continue; }   // the portal must really be needed
   const f = flips(def, r.path);
   if (cfg.flipGoals && f.bf < 1) continue;
   out.push({ len: r.len, pushes, use, bf: f.bf, def });

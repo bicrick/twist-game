@@ -21,6 +21,13 @@
   70%  { transform: translate(0, 0) rotate(0deg) scale(1.1, .9); }
   100% { transform: rotate(var(--tilt, 0deg)) scale(1, 1); }
 }
+/* refused move: a little shove against the obstacle, then back, with a squash */
+.bot-sq.bonk { animation: bonk .24s ease-out; }
+@keyframes bonk {
+  0%   { transform: scale(1, 1); }
+  35%  { transform: translate(calc(var(--lx, 0) * 14%), calc(var(--ly, 0) * 14%)) scale(calc(1 - var(--ax, 0) * .16 + var(--ay, 0) * .12), calc(1 - var(--ay, 0) * .16 + var(--ax, 0) * .12)); }
+  100% { transform: scale(1, 1); }
+}
 /* the bot's goal: just its outline */
 .piece.ghost.home { --c: var(--home); filter: none; opacity: .6; }
 .piece.ghost.home .cb { fill: color-mix(in srgb, var(--c) 9%, transparent); stroke: var(--c); stroke-width: 3.5; stroke-linejoin: round; }
@@ -60,5 +67,5 @@
 .copy .puff { display: none; }
 
 /* Reduce motion setting (also the OS preference by default): no hop, no puffs, no drifting, no blink */
-html.reduce-motion .bot-sq.hop, html.reduce-motion .eye, html.reduce-motion .fbot, html.reduce-motion .go { animation: none !important; }
+html.reduce-motion .bot-sq.hop, html.reduce-motion .bot-sq.bonk, html.reduce-motion .eye, html.reduce-motion .fbot, html.reduce-motion .go { animation: none !important; }
 html.reduce-motion .piece, html.reduce-motion .face, html.reduce-motion .gaze { transition-duration: .01s !important; }

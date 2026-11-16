@@ -31,7 +31,7 @@ export function showTitle() {
   hero.style.width = hero.style.height = H + 'px'; hero.style.setProperty('--cell', H + 'px');
   bot.style.left = bot.style.top = '0'; orient(bot, { fx: 0, fy: 0 }); setActiveBot(bot, H);
   el('word', root).textContent = 'Twist';
-  const play = el('play', root); play.textContent = 'Play';
+  const play = el('play', root); play.textContent = matchMedia('(pointer: fine)').matches ? 'Press space' : 'Play';
   const sub = el('sub', root); sub.textContent = 'Settings'; sub.onpointerdown = e => { e.stopPropagation(); openSettings(); };
   const { solved, total } = progress.totals();
   if (solved) el('count', root).textContent = solved + ' of ' + total + ' solved';

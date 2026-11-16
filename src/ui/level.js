@@ -5,7 +5,7 @@ import { piece, orient } from './pieces.js';
 import { theme } from './theme.js';
 import { announce } from './hud.js';
 import { celebrate } from './celebrate.js';
-import { setActiveBot, stepBot } from './bot.js';
+import { setActiveBot, stepBot, bonkBot } from './bot.js';
 import { puff } from './fx.js';
 import { levelCell, LEVEL_MARGIN } from './layout.js';
 import { nav } from './nav.js';
@@ -190,7 +190,7 @@ export function move(dr, dc) {
   if (busy) return;
   curDir = [dr, dc];
   const ns = step(state, dr, dc);
-  if (!ns) { sfx.blocked(); return; }
+  if (!ns) { sfx.blocked(); bonkBot(panes[0].pl, dr, dc); return; }
   const ev = stepEvents(state, ns, dr, dc);
   const from = state.player;
   hist.push(state); dirs.push(curDir); redoStack.length = 0; state = ns;
@@ -223,8 +223,11 @@ function finish() {
   if (completed !== null) {                       // that was the last missing main level of the world
     const w = completed; completed = null; nav.hub(w);
     sfx.unlocked();
-  } else if (next < levels.length && !levels[next].challenge && !levels[li].challenge) nav.level(wi, next);   // carry straight on
-  else nav.world(wi, li);                          // end of the main run, or a challenge: back to the room
+  } else {
+    // carry on to the next level of the same group; at the end of a group (or after a challenge) go back to the room
+    const g = progress.groupsOf(wi).find(x => x.includes(li)), at = g ? g.indexOf(li) : -1;
+    if (at >= 0 && at + 1 < g.length) nav.level(wi, g[at + 1]); else nav.world(wi, li);
+  }
   if (finale || perfect) setTimeout(() => celebrate(perfect ? 'perfect' : 'clear'), 750);
 }
 export const rebuild = () => build();

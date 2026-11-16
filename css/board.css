@@ -34,7 +34,9 @@
 .cell.gate.open::before { opacity: .16; transform: scale(.55); }
 
 /* menu rooms: the same framed square box as a level (no reflections) */
-#floor.room { box-shadow: 0 0 0 2px var(--frame); }
+#floor.room { border-radius: calc(var(--cell) * .32); box-shadow: 0 0 0 2px var(--frame); }
+/* boards with NO reflections (rooms, hub, fully walled levels) are rounded with the walls' own radius; boards with reflections stay square */
+#floor.solid { border-radius: calc(var(--cell) * .10); box-shadow: 0 0 0 calc(var(--cell) * .22) var(--wall); }
 
 /* portals read as portals: a slowly spinning dashed ring, a glow on both ends when you stand next to one, a ripple when used */
 .cell.portal::before { border-style: dashed; animation: portalSpin 8s linear infinite; }
