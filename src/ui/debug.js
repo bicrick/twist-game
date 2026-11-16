@@ -16,6 +16,7 @@ export function initDebug() {
     const cs = getComputedStyle(probe), vv = window.visualViewport, sw = 'serviceWorker' in navigator ? (await navigator.serviceWorker.getRegistrations()).length : 'n/a';
     const mem = performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB' : 'n/a';
     box.textContent =
+      `build ${window.__BUILD__}\n` +
       `fps ${fps}  worst frame ${Math.round(worst)}ms  heap ${mem}\n` +
       `viewport ${innerWidth}x${innerHeight} @${devicePixelRatio}x  visual ${vv ? vv.width.toFixed(0) + 'x' + vv.height.toFixed(0) + ' scale ' + vv.scale.toFixed(2) : 'n/a'}\n` +
       `pointer ${mq('(pointer: coarse)') ? 'coarse(touch)' : 'fine'} hover ${mq('(hover: hover)')} maxTouch ${navigator.maxTouchPoints}\n` +
