@@ -33,7 +33,9 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 - Each world has its own bot: lopsided on purpose so orientation reads from the outline (cloud / teardrop / hexagon / triangle, each a different colour that never matches the world's wall hue). Eyes follow the pointer / last move, blink, idle-glance; squash + hop per step; puffs trail behind. Goals are outlines of the same bot / pebble; they turn green when matched.
 - Home screen: its own identity (hero bot watching your pointer, rounded "Twist", Play, crowd of varied bots). Do NOT mimic Parabox's title (no keycaps, no gray squares, no framed-letter wordmark). Dim squircle particles drift behind every screen.
 - Text only: no banners, no level title chip, no hint text. Back button is fine.
-- Menu rooms are plain framed boxes, compact (doors adjacent, joined by short connectors); no reflections in menus.
+- Menu rooms are plain framed boxes, compact (doors adjacent, joined by short connectors); no reflections in menus. A room map is ROTATED to match the screen (wide map on a portrait phone -> upright, tall map on a landscape screen -> on its side; `transpose` in `data/roommap.js`) so doors stay big; same topology, so walking directions differ by orientation.
+- Solid borders are ONE full-brightness rim bar running the full length across all reflections (drawn on the floor, not inside the faded copies); no white frame on glued edges.
+- Menus: real touch targets (>= 46-52px rows), readable heading (menu.js builds divs: style `.h2`, not `h2`), and while a menu is open the pad's Reset/Undo/Redo become one big OK button (`html.menu-open`).
 - Pad (touch / narrow): D-pad (slides between directions) + Reset / Undo / Redo icon buttons (greyed when unavailable) + plain Back and Menu buttons. Landscape puts D-pad left, actions right.
 - User dislikes: antenna/stripes on bots, dash-shaped faces, pink player, rounded seam lines, big titles, spacious rooms, being zoomed out.
 
@@ -45,7 +47,7 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 - Reflections: just enough copies to cover the screen (`MAX_PANES` 49), sparse DOM (no nodes for empty cells), no blur / filters / animation inside `.copy`. Move pieces with `transform`, never `left/top`. Avoid per-piece forced reflows. No pop-in: build while hidden (`#stage.building`), reveal via `swap()`.
 
 ## Verification (done for the shipped build)
-- Full playthrough through the real UI flow with key presses (title -> hub -> world, auto-advance, unlocks, group gating, challenges): all 36 levels solved, 0 errors. Undo/redo round trip checked via `__level`. Audited at 1440x900, 412x798, 390x844, 360x640, 844x390 (landscape pad). Median frame ~8 ms (120 Hz), worst < 10 ms.
+- Full playthrough through the real UI flow with key presses (title -> hub -> world, auto-advance, unlocks, group gating, challenges): all 36 levels solved, 0 errors. Undo/redo round trip checked via `__level`. Audited at 1440x900, 768x1024, 412x798, 390x844, 360x640, 320x568, 844x390 (landscape pad). Touch audit with synthetic touch pointer events: title Play, D-pad walking hub -> room -> level, Undo/Redo/Reset, Back/Menu, menu rows/toggles/arrows, pause -> level select -> hub -> title, settings persistence. Rotation mid-level preserves state; 2000 random key presses over all worlds: 0 errors, no DOM growth. Median frame ~8 ms (120 Hz), worst < 10 ms. Not done: a physical phone, hearing the sounds.
 
 ## Ideas / next
 - More levels per world; a fifth mechanic; hints; level editor; TypeScript for engine + data; sound/music pass (not heard by the author yet).

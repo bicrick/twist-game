@@ -62,3 +62,8 @@ html.with-pad #screen { border-radius: 12px; box-shadow: 0 0 0 2px #1d2a35; back
 .mid { display: flex; gap: 12px; justify-content: center; align-items: center; }
 .pill { min-width: 84px; padding: 9px 20px; border: 0; border-radius: 13px; background: var(--pad-key); color: rgba(255,255,255,.85); font: 600 14px/1 var(--font); touch-action: none; box-shadow: 0 3px 0 rgba(0,0,0,.4); }
 .pill:active, .pill.on { background: var(--pad-key-hi); transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.4); }
+
+/* while a menu is open the action cluster becomes one big OK button (the D-pad moves / adjusts, Back closes) */
+.act.ok { display: none; font: 800 calc(var(--pad-u) * .5)/1 var(--font); background: var(--pad-b); color: #08210f; }
+html.menu-open .act:not(.ok) { display: none; }
+html.menu-open .act.ok { display: grid; left: 50%; top: 10%; width: calc(var(--pad-u) * 2); height: calc(var(--pad-u) * 2); margin-left: calc(var(--pad-u) * -1); border-radius: 50%; }

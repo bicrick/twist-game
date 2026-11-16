@@ -1,6 +1,6 @@
 /* The board: floor, walls, pads, seams, reflected copies. Shared by levels and rooms. */
 /* boards are SQUARE-edged: a glued world tiles edge to edge with its reflections. Solid edges get a wall rim instead. */
-#floor { position: relative; background: var(--floor); box-shadow: 0 0 0 2px var(--frame); transition: background .5s ease; }
+#floor { position: relative; background: var(--floor); transition: background .5s ease; }   /* no frame: a glued edge is not a border; solid edges get the rim */
 .copy { position: absolute; z-index: 1; background: var(--floor); transition: background .5s ease; contain: layout style; }
 .cell { position: absolute; width: var(--cell); height: var(--cell); }
 /* walls: bright clay stones with a darker underside */

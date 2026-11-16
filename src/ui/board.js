@@ -6,14 +6,16 @@ import { screenSize } from './layout.js';
 
 const MAX_PANES = 49;
 
-// Solid ('none') edges get a wall rim just outside the board; glued edges get nothing (the reflections show them).
-function rims(root, spec, cell) {
+// Solid ('none') edges get a wall rim just outside the board. The rim is ONE bar at full brightness that runs the
+// whole length across all the reflections (never faded, never cut at the board edge).
+function rims(root, spec, cell, nI, nJ) {
   const { W: cw, H: ch, lr, tb } = spec, W = cw * cell, H = ch * cell, t = Math.round(cell * .22);
   const lrN = lr === 'none', tbN = tb === 'none';
   const bar = (x, y, w, h) => { const d = el('rim', root); Object.assign(d.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); };
-  const x0 = lrN ? -t : 0, wTB = W + (lrN ? 2 * t : 0);
-  if (tbN) { bar(x0, -t, wTB, t); bar(x0, H, wTB, t); }
-  if (lrN) { bar(-t, 0, t, H); bar(W, 0, t, H); }
+  const x0 = lrN ? -t : -(nI + 1) * W, x1 = lrN ? W + t : (nI + 2) * W;     // horizontal extent (top / bottom bars)
+  const y0 = tbN ? -t : -(nJ + 1) * H, y1 = tbN ? H + t : (nJ + 2) * H;     // vertical extent (side bars)
+  if (tbN) { bar(x0, -t, x1 - x0, t); bar(x0, H, x1 - x0, t); }
+  if (lrN) { bar(-t, y0, t, y1 - y0); bar(W, y0, t, y1 - y0); }
 }
 
 /**
@@ -34,7 +36,7 @@ export function createBoard(stage, spec, cell, fillPane, opts = {}) {
   nI = Math.max(0, nI); nJ = Math.max(0, nJ);
   while ((2 * nI + 1) * (2 * nJ + 1) > MAX_PANES && (nI > 1 || nJ > 1)) { if (nI >= nJ) nI--; else nJ--; }
   fillPane(floor, 'm');
-  if (!opts.flat) rims(floor, spec, cell);
+  if (!opts.flat) rims(floor, spec, cell, nI, nJ);
   floor.dataset.rimTop = !opts.flat && tb === 'none' ? Math.round(cell * .22) : 0;
   for (let i = -nI; i <= nI; i++) for (let j = -nJ; j <= nJ; j++) {
     if (!i && !j) continue;
@@ -44,7 +46,7 @@ export function createBoard(stage, spec, cell, fillPane, opts = {}) {
     cp.style.opacity = Math.max(.12, .48 * Math.pow(.62, d - 1));
     const flipY = lr === 'twist' && Math.abs(i) % 2 === 1, flipX = tb === 'twist' && Math.abs(j) % 2 === 1;
     cp.style.transform = `scale(${flipX ? -1 : 1}, ${flipY ? -1 : 1})`;
-    fillPane(cp, `c${i},${j}`); rims(cp, spec, cell);
+    fillPane(cp, `c${i},${j}`);
   }
   return floor;
 }

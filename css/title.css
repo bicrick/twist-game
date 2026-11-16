@@ -25,3 +25,10 @@
 .fbot.f-happy .eye { height: 11%; width: 12%; border-radius: 99px 99px 0 0; animation: none; }
 .fbot.f-wide .eye { width: 14%; height: 14%; border-radius: 50%; }
 .fbot.f-surprised .eye { width: 15%; height: 15%; border-radius: 50%; }
+
+/* small phones: fewer, smaller bots, kept to the edges so they never sit on the buttons */
+@media (max-width: 440px), (max-height: 640px) {
+  .fbot:nth-child(n+5) { display: none; }
+  .fbot { scale: .62; }
+  .hero { margin-bottom: 0; }
+}

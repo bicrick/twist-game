@@ -1,23 +1,27 @@
-/* Overlay menus (pause / settings) */
-#menu { position: absolute; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; background: rgba(3,6,9,.6); }
+/* Overlay menus (pause / settings): big touch targets, soft card, readable heading */
+#menu { position: absolute; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; padding: 14px; background: rgba(3,6,9,.66); }
 #menu.on { display: flex; animation: menuIn .14s ease-out; }
 @keyframes menuIn { from { opacity: 0; } to { opacity: 1; } }
-#menu .card { width: min(88vw, 400px); background: var(--card); border-radius: 26px; padding: 18px 14px 14px; box-shadow: 0 0 0 2px var(--frame), 0 18px 50px rgba(0,0,0,.5); animation: cardIn .18s ease-out; }
+#menu .card { width: min(100%, 420px); max-height: 100%; overflow-y: auto; background: var(--card); border-radius: 26px; padding: 18px 12px 12px;
+              box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 22px 60px rgba(0,0,0,.55); animation: cardIn .18s ease-out; }
 @keyframes cardIn { from { transform: translateY(8px) scale(.98); } to { transform: none; } }
-#menu h2 { margin: 2px 14px 12px; font: 700 20px/1 var(--font); color: var(--ink); }
-#menu .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 14px; border-radius: 15px; font: 600 16px/1.1 var(--font); color: var(--ink); cursor: pointer; }
+#menu .h2 { margin: 0 12px 12px; font: 800 22px/1.1 var(--font); color: var(--ink); }
+#menu .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 14px; margin-top: 4px; border-radius: 16px;
+             font: 600 17px/1.15 var(--font); color: var(--ink); cursor: pointer; }
 #menu .row.sel { background: var(--card-2); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--wall) 70%, transparent); }
 #menu .row.danger { color: #ff7b86; }
 #menu .val { display: flex; align-items: center; gap: 8px; color: var(--ink-soft); font-weight: 600; }
-#menu .arr { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 9px; background: rgba(255,255,255,.1); color: var(--ink); font-size: 18px; line-height: 1; }
-#menu .txt { min-width: 62px; text-align: center; }
-#menu .pill { min-width: 0; padding: 4px 11px; border-radius: 99px; background: rgba(255,255,255,.1); color: var(--ink-soft); }
-#menu .pill.on { background: var(--okc); color: #fff; }
+#menu .arr { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; background: rgba(255,255,255,.1); color: var(--ink); font-size: 22px; line-height: 1; }
+#menu .txt { min-width: 64px; text-align: center; }
+#menu .pill { min-width: 0; padding: 6px 14px; border-radius: 99px; background: rgba(255,255,255,.1); color: var(--ink-soft); }
+#menu .pill.on { background: var(--okc); color: #052b14; }
 html.reduce-motion #menu.on, html.reduce-motion #menu .card { animation: none; }
 
-/* short screens (small phones with the pad): tighter rows so the whole card fits */
+/* short screens (small phones with the pad): slightly tighter, still thumb-friendly */
 @media (max-height: 720px) {
-  #menu .card { padding: 14px 10px 10px; }
-  #menu h2 { margin: 0 12px 6px; font-size: 18px; }
-  #menu .row { padding: 8px 12px; font-size: 15px; }
+  #menu { padding: 8px; }
+  #menu .card { padding: 14px 10px 8px; }
+  #menu .h2 { margin: 0 12px 8px; font-size: 20px; }
+  #menu .row { min-height: 46px; font-size: 16px; margin-top: 2px; }
+  #menu .arr { width: 32px; height: 32px; }
 }

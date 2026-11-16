@@ -10,6 +10,9 @@ function normalize(rows) {
   const blank = '.'.repeat(c1 - c0 + 1 + 2 * MARGIN);
   return [...Array(MARGIN).fill(blank), ...rows.slice(r0, r1 + 1).map(row => '.'.repeat(MARGIN) + row.slice(c0, c1 + 1) + '.'.repeat(MARGIN)), ...Array(MARGIN).fill(blank)];
 }
+// Turn a map on its side (rows <-> columns). Rooms use it to match the screen: a wide map on a portrait phone is
+// shown upright (and vice versa), so the doors can be much bigger. Same topology, just rotated.
+export function transpose(rows) { return [...rows[0]].map((_, c) => rows.map(r => r[c]).join('')); }
 export function parseMap(raw) {
   const rows = normalize(raw);
   const H = rows.length, W = rows[0].length;

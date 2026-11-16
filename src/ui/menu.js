@@ -21,6 +21,7 @@ function draw() {
   let root = $('menu'); if (!root) { root = el('', $('screen')); root.id = 'menu'; }
   const top = stack[stack.length - 1];
   root.classList.toggle('on', !!top);
+  document.documentElement.classList.toggle('menu-open', !!top);
   if (!top) { root.innerHTML = ''; return; }
   root.innerHTML = '';
   root.onpointerdown = e => { if (e.target === root) closeMenu(); e.stopPropagation(); };

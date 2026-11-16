@@ -4,11 +4,11 @@ import { $, el, LOCK_SVG, BACK_SVG, svgIcon } from './dom.js';
 import { createBoard } from './board.js';
 import { piece, orient } from './pieces.js';
 import { theme } from './theme.js';
-import { roomCell } from './layout.js';
+import { roomCell, screenSize } from './layout.js';
 import { nav } from './nav.js';
 import { sfx } from '../audio/sfx.js';
 import { WORLDS } from '../data/worlds.js';
-import { parseMap, joined, isDoor } from '../data/roommap.js';
+import { parseMap, transpose, joined, isDoor } from '../data/roommap.js';
 import { previewURL } from './preview.js';
 import { setActiveBot, stepBot } from './bot.js';
 import { puff } from './fx.js';
@@ -98,7 +98,9 @@ export function showHub(from) {
 }
 
 export function showWorld(w, from) {
-  const def = WORLDS[w], m = parseMap(def.map);
+  const def = WORLDS[w]; let m = parseMap(def.map);
+  const [sw, sh] = screenSize();
+  if (m.W !== m.H && (m.W > m.H) !== (sw > sh)) m = parseMap(transpose(m.rows));   // match the screen's orientation
   pos = [...(from == null ? m.start : standNextTo(m, m.levels[from]))];
   const doors = def.levels.map((d, l) => {
     const open = progress.levelOpen(w, l);

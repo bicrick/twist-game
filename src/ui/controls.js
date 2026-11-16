@@ -20,7 +20,7 @@ export function initControls(h) {
     let t = 0;
     const stop = () => { clearTimeout(t); clearInterval(t); node.classList.remove('on'); };
     node.addEventListener('pointerdown', e => {
-      e.preventDefault(); node.setPointerCapture(e.pointerId); node.classList.add('on');
+      e.preventDefault(); try { node.setPointerCapture(e.pointerId); } catch (err) {} node.classList.add('on');
       h.gesture(); buzz(); fn();
       if (repeat) t = setTimeout(() => { t = setInterval(fn, 150); }, 380);
     });
@@ -63,6 +63,7 @@ export function initControls(h) {
   const bUndo = icon('undo', 'undo', SV('M9 14 4 9l5-5M4 9h9a6 6 0 0 1 0 12h-3'), () => h.undo());
   const bRedo = icon('redo', 'redo', SV('M15 14l5-5-5-5M20 9h-9a6 6 0 0 0 0 12h3'), () => h.redo());
   padBtns = { undo: bUndo, redo: bRedo, reset: bReset };
+  { const ok = document.createElement('button'); ok.className = 'act ok'; ok.setAttribute('aria-label', 'choose'); ok.textContent = 'OK'; acts.appendChild(ok); press(ok, () => h.confirm()); }
   // bottom row: plain buttons
   const mid = el('mid', pad);
   [['Back', () => h.back()], ['Menu', () => h.menu()]].forEach(([label, fn]) => {
