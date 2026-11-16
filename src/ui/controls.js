@@ -1,6 +1,6 @@
 // On-screen gamepad: a D-pad plus A / B / Start / Select, GBA-emulator style.
 // Pure input: turns presses into the same intents as the keyboard (see input.js).
-//   D-pad = move (hold to repeat)   A = undo   B = back   Start = restart   Select = mute
+//   D-pad = move (hold to repeat, slide to change direction)   A = undo   B = back   Start = restart   Select = mute
 import { $, el } from './dom.js';
 
 const ARROW = '<svg viewBox="0 0 24 24"><path d="M12 6 5 17h14z" fill="currentColor"/></svg>';
@@ -24,12 +24,32 @@ export function initControls(h) {
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => node.addEventListener(ev, stop));
   }
 
-  const dpad = el('dpad', pad);
+  // One cross that rocks toward the pressed direction. A single surface reads the thumb position,
+  // so sliding between arms switches direction without lifting, like a real D-pad.
+  const dpad = el('dpad', pad), cross = el('cross', dpad);
   for (const d of Object.keys(DIR)) {
-    const k = document.createElement('button'); k.className = 'k ' + d; k.setAttribute('aria-label', d);
-    k.innerHTML = ARROW; k.firstChild.style.transform = `rotate(${ROT[d]}deg)`; dpad.appendChild(k);
-    press(k, () => h.dir(...DIR[d]), true);
+    const arm = el('arm ' + d, cross); arm.innerHTML = ARROW; arm.firstChild.style.transform = `rotate(${ROT[d]}deg)`;
   }
+  el('shade', cross);
+  el('dimple', cross);
+  let cur = null, timer = 0, active = false;
+  const hold = fn => { clearTimeout(timer); clearInterval(timer); timer = setTimeout(() => { timer = setInterval(fn, 150); }, 380); };
+  const setDir = d => {
+    if (d === cur) return;
+    cur = d; clearTimeout(timer); clearInterval(timer);
+    if (d) dpad.dataset.dir = d; else delete dpad.dataset.dir;
+    if (!d) return;
+    navigator.vibrate && navigator.vibrate(8);
+    const fire = () => h.dir(...DIR[d]); fire(); hold(fire);
+  };
+  const dirAt = e => {
+    const r = dpad.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    if (Math.hypot(dx, dy) < r.width * .08) return cur;           // dead centre: keep what we had
+    return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+  };
+  dpad.addEventListener('pointerdown', e => { e.preventDefault(); active = true; try { dpad.setPointerCapture(e.pointerId); } catch (err) {} h.gesture(); setDir(dirAt(e)); });
+  dpad.addEventListener('pointermove', e => { if (active) setDir(dirAt(e)); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => dpad.addEventListener(ev, () => { active = false; setDir(null); }));
   const abs = el('abs', pad);
   const btn = (cls, label, aria, fn, parent) => { const b = document.createElement('button'); b.className = cls; b.textContent = label; b.setAttribute('aria-label', aria); parent.appendChild(b); press(b, fn); return b; };
   btn('b bb', 'B', 'back', () => h.back(), abs);
