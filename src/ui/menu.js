@@ -6,18 +6,21 @@ import { sfx } from '../audio/sfx.js';
 
 const stack = [];
 export const isOpen = () => stack.length > 0;
+const stackListeners = [];
+export const onStackChange = fn => stackListeners.push(fn);
+const notifyStack = () => { for (const fn of stackListeners) fn(isOpen()); };
 
 export const icon = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 
 /** spec: { layout:'grid'|'list', cols?, items:[{ icon:svgInner|()=>svgInner, label:str|()=>str, kind:'button'|'switch'|'bar'|'dots',
  *          act(), on()->bool, n, at()->index, set(i), step(dir), danger? }], onClose? } */
-export function openMenu(spec) { stack.push({ spec, sel: 0 }); draw(); sfx.confirm(); }
+export function openMenu(spec) { stack.push({ spec, sel: 0 }); draw(); sfx.confirm(); notifyStack(); }
 export function closeMenu() {
   const top = stack.pop(); if (!top) return;
   if (top.spec.onClose) top.spec.onClose();
-  draw(); sfx.back();
+  draw(); sfx.back(); notifyStack();
 }
-export function closeAll() { while (stack.length) { const t = stack.pop(); if (t.spec.onClose) t.spec.onClose(); } draw(); }
+export function closeAll() { while (stack.length) { const t = stack.pop(); if (t.spec.onClose) t.spec.onClose(); } draw(); notifyStack(); }
 
 const val = (v, ...a) => typeof v === 'function' ? v(...a) : v;
 

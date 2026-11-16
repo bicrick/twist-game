@@ -28,7 +28,7 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 - `src/engine/engine.js`: pure rules (`parseLevel`, `nxt`, `step`, `stepSlide`, `openGates`, `stepEvents`, `isWin`). No DOM; Node tools import it.
 - `src/data/worlds.js` lists the worlds; one file per world in `src/data/worlds/` (name, hue, `bot`, icon, groups, ASCII room map, levels). `src/data/roommap.js` parses room maps (crops + 1-cell margin; `.` floor `,` trail `X` back door `0-9a-z` level index; adjacent path cells are joined).
 - Level: `{w,h,lr,tb,walls:[[r,c]],player:[r,c,fx,fy],home:[r,c,fx,fy],blocks:[...],targets:[...], slide?, portals?:[[r1,c1,r2,c2,flip?]], plates?:[[r,c,id]], gates?:[[r,c,id]], pads?, challenge?}`.
-- `src/audio/sfx.js`: every sound by game event (Cuelume cues; seam/reflection/portal crossing and entering a world use `count`). `src/state/progress.js` (levels done, groups, `twist-done4`), `src/state/settings.js` (`twist-settings`: sound, volume, style, reduce motion, trail, haptics).
+- `src/audio/sfx.js`: every sound by game event (Cuelume cues; seam/reflection/portal crossing and entering a world use `count`). `src/audio/music.js`: Web Audio OST player (lazy-load `public/music/*.m4a`, gapless loop, 1.25 s crossfade; pause/settings ducks to the pause bed). `src/state/progress.js` (levels done, groups, `twist-done4`), `src/state/settings.js` (`twist-settings`: sound, volume, style, reduce motion, trail, haptics). Music on/volume is a separate `twist-music` key; `n` mutes both (master sound) without renaming existing keys.
 - `src/ui/`: `app.js` router + the shared intents, `title.js`, `rooms.js` (hub 2x2 + world rooms), `level.js` (play, undo/redo, gates, warp animation), `board.js` (shared board: reflections + solid-edge rims), `layout.js` (sizing), `pieces.js` + `botshape.js` + `bot.js` (bots), `fx.js` (puffs), `particles.js`, `transition.js` (`swap()`: every screen change), `menu.js` + `menus.js` (pause / settings), `controls.js` (touch pad), `input.js` (keyboard + swipe), `hud.js`, `preview.js`, `palette.js`, `theme.js`, `nav.js`.
 - Test hooks on `window`: `__enter(w,l)`, `__world(w)`, `__hub()`, `__done()`, `__progress`, `__level` (`peek()`, `move/undo/redo`), `__set(f)`.
 
@@ -65,4 +65,4 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 - NOT done (cannot be from here): a physical phone, listening to the sounds with ears.
 
 ## Ideas / next
-- More levels per world; a fifth mechanic; hints; level editor; TypeScript for engine + data; sound/music pass (not heard by the author yet).
+- More levels per world; a fifth mechanic; hints; level editor; TypeScript for engine + data. Settled (solve sting) and Afterimage (credits) tracks are not in yet. Music has not been heard on a physical phone.
