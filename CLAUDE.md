@@ -51,7 +51,10 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 - **Touch pass at 390x844 (one uninterrupted run, synthetic touch pointer events): 28/28.** Play, D-pad walking hub -> room -> level, locked-door counts, Undo/Redo/Reset + their greyed states, Back/Menu, menu rows / toggles / arrows, OK-button menu mode, pause -> Level select -> hub -> title, settings persistence.
 - **Desktop pass (one run, keyboard + mouse): 18/18.** No pad, Esc/Tab menus, keyboard menu navigation, locked doors refuse, z/y/r, Level select, Esc chain, mouse Play, no overflow.
 - Also checked: rotation mid-level keeps state; 2000 random key presses across all worlds (0 errors, no DOM growth); layouts at 1440x900, 768x1024, 412x798, 390x844, 360x640, 320x568, 844x390 (landscape pad); median frame ~8 ms, worst < 10 ms.
-- NOT done (cannot be from here): a physical phone, hearing the sounds.
+- **Lighthouse (mobile, throttled) on production:** Performance 97, Best Practices 100, SEO 100, Accessibility 92 -> fixed its one finding (the viewport tag blocked pinch-zoom). Re-run: `CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npx lighthouse https://twist-game.vercel.app --form-factor=mobile --output=json`.
+- **Sound audit by measurement** (Web Audio output tapped through an analyser, after a real user gesture): all 19 game sound events produce signal (peaks 0.024-0.18, 0.05-0.9 s long, tonal centroids 228 Hz-5 kHz so they are distinguishable); mute and volume 0 give exact silence, volume scales the level, the 4 sound styles have clearly different timbres.
+- **Level variety audit** (`node tools/audit_levels.mjs`): 36 levels, 10 distinct mechanic combos, 8 board sizes, 1-2 blocks; moves 3-32 main (avg 17), 30-49 challenge (avg 38); per-world group averages rise monotonically (Twist 7>11>13>15, Slide 14>21>28, Warp 11>20>26, Gate 12>23>30).
+- NOT done (cannot be from here): a physical phone, listening to the sounds with ears.
 
 ## Ideas / next
 - More levels per world; a fifth mechanic; hints; level editor; TypeScript for engine + data; sound/music pass (not heard by the author yet).

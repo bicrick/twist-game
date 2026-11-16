@@ -1,3 +1,5 @@
+// Prints every level's size, edges, blocks, mechanic use, solution length, pushes and flips, plus per-world difficulty ramps.
+// Run: node tools/audit_levels.mjs
 import { WORLDS } from '../src/data/worlds.js';
 import { solve, flips, api } from './lib.js';
 const D = [[-1,0,'U'],[1,0,'D'],[0,-1,'L'],[0,1,'R']];
