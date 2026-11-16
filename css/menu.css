@@ -1,27 +1,48 @@
-/* Overlay menus (pause / settings): big touch targets, soft card, readable heading */
+/* Overlay menus (pause / settings): icon tiles + icon rows, a caption names the focused item */
 #menu { position: absolute; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; padding: 14px; background: rgba(3,6,9,.66); }
 #menu.on { display: flex; animation: menuIn .14s ease-out; }
 @keyframes menuIn { from { opacity: 0; } to { opacity: 1; } }
-#menu .card { width: min(100%, 420px); max-height: 100%; overflow-y: auto; background: var(--card); border-radius: 26px; padding: 18px 12px 12px;
+#menu .card { width: min(100%, 400px); max-height: 100%; overflow-y: auto; background: var(--card); border-radius: 26px; padding: 14px 12px 12px;
               box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 22px 60px rgba(0,0,0,.55); animation: cardIn .18s ease-out; }
 @keyframes cardIn { from { transform: translateY(8px) scale(.98); } to { transform: none; } }
-#menu .h2 { margin: 0 12px 12px; font: 800 22px/1.1 var(--font); color: var(--ink); }
-#menu .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 14px; margin-top: 4px; border-radius: 16px;
-             font: 600 17px/1.15 var(--font); color: var(--ink); cursor: pointer; }
-#menu .row.sel { background: var(--card-2); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--wall) 70%, transparent); }
+#menu .card.grid { width: min(100%, 340px); }
+#menu .cap { text-align: center; min-height: 24px; margin: 12px 0 2px; font: 700 16px/1.2 var(--font); color: var(--ink); }
+#menu svg { width: 100%; height: 100%; display: block; }
+
+/* pause: grid of big icon tiles */
+#menu .tiles { display: grid; grid-template-columns: repeat(var(--cols, 3), 1fr); gap: 10px; }
+#menu .tile { aspect-ratio: 1; display: grid; place-items: center; border-radius: 20px; background: var(--card-2); color: var(--ink-soft); cursor: pointer; }
+#menu .tile .ico { width: 44%; height: 44%; }
+#menu .tile.sel { color: var(--ink); background: color-mix(in srgb, var(--wall) 30%, var(--card-2)); box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--wall) 85%, transparent); transform: scale(1.04); }
+
+/* settings: icon rows with visual controls */
+#menu .row { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 52px; padding: 0 14px; margin-top: 4px; border-radius: 16px; color: var(--ink-soft); cursor: pointer; }
+#menu .row .ico { width: 26px; height: 26px; flex: none; }
+#menu .row.sel { background: var(--card-2); color: var(--ink); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--wall) 70%, transparent); }
 #menu .row.danger { color: #ff7b86; }
-#menu .val { display: flex; align-items: center; gap: 8px; color: var(--ink-soft); font-weight: 600; }
-#menu .arr { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; background: rgba(255,255,255,.1); color: var(--ink); font-size: 22px; line-height: 1; }
-#menu .txt { min-width: 64px; text-align: center; }
-#menu .pill { min-width: 0; padding: 6px 14px; border-radius: 99px; background: rgba(255,255,255,.1); color: var(--ink-soft); }
-#menu .pill.on { background: var(--okc); color: #052b14; }
+#menu .row.button { justify-content: flex-start; }
+#menu .sw { width: 50px; height: 28px; border-radius: 99px; background: rgba(255,255,255,.14); position: relative; transition: background .15s; flex: none; }
+#menu .sw .knob { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .15s; }
+#menu .sw.on { background: var(--okc); }
+#menu .sw.on .knob { transform: translateX(22px); }
+#menu .bar, #menu .dots { display: flex; align-items: center; gap: 4px; }
+#menu .bar .seg { width: 12px; height: 26px; border-radius: 5px; background: rgba(255,255,255,.14); }
+#menu .bar .seg.on { background: var(--okc); }
+#menu .dots { gap: 10px; }
+#menu .dots .seg { width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,.14); }
+#menu .dots .seg.on { background: var(--okc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--okc) 30%, transparent); }
 html.reduce-motion #menu.on, html.reduce-motion #menu .card { animation: none; }
 
 /* short screens (small phones with the pad): slightly tighter, still thumb-friendly */
 @media (max-height: 720px) {
   #menu { padding: 8px; }
-  #menu .card { padding: 14px 10px 8px; }
-  #menu .h2 { margin: 0 12px 8px; font-size: 20px; }
-  #menu .row { min-height: 46px; font-size: 16px; margin-top: 2px; }
-  #menu .arr { width: 32px; height: 32px; }
+  #menu .card { padding: 10px 10px 8px; }
+  #menu .row { min-height: 46px; margin-top: 2px; }
+  #menu .card.grid { width: min(100%, 290px); }
+}
+@media (max-height: 560px) {
+  #menu .row { min-height: 36px; margin-top: 1px; }
+  #menu .row .ico { width: 22px; height: 22px; }
+  #menu .cap { margin: 6px 0 0; min-height: 20px; font-size: 15px; }
+  #menu .bar .seg { height: 20px; } #menu .sw { height: 24px; width: 44px; } #menu .sw .knob { width: 18px; height: 18px; } #menu .sw.on .knob { transform: translateX(20px); }
 }

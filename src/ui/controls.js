@@ -67,7 +67,7 @@ export function initControls(h) {
   // bottom row: plain buttons
   const mid = el('mid', pad);
   [['Back', () => h.back()], ['Menu', () => h.menu()]].forEach(([label, fn]) => {
-    const b = document.createElement('button'); b.className = 'pill'; b.textContent = label; mid.appendChild(b); press(b, fn);
+    const b = document.createElement('button'); b.className = 'pbtn'; b.textContent = label; mid.appendChild(b); press(b, fn);
   });
 }
 

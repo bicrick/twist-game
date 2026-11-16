@@ -36,7 +36,9 @@ export function createBoard(stage, spec, cell, fillPane, opts = {}) {
   nI = Math.max(0, nI); nJ = Math.max(0, nJ);
   while ((2 * nI + 1) * (2 * nJ + 1) > MAX_PANES && (nI > 1 || nJ > 1)) { if (nI >= nJ) nI--; else nJ--; }
   fillPane(floor, 'm');
-  if (!opts.flat) rims(floor, spec, cell, nI, nJ);
+  const solid = !opts.flat && lr === 'none' && tb === 'none';       // no reflections at all: a rounded box with a wall ring
+  if (solid) floor.classList.add('solid');
+  else if (!opts.flat) rims(floor, spec, cell, nI, nJ);
   floor.dataset.rimTop = !opts.flat && tb === 'none' ? Math.round(cell * .22) : 0;
   for (let i = -nI; i <= nI; i++) for (let j = -nJ; j <= nJ; j++) {
     if (!i && !j) continue;

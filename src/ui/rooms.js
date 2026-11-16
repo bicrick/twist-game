@@ -11,6 +11,7 @@ import { WORLDS } from '../data/worlds.js';
 import { parseMap, transpose, joined, isDoor } from '../data/roommap.js';
 import { previewURL } from './preview.js';
 import { setActiveBot, stepBot } from './bot.js';
+import { announce } from './hud.js';
 import { puff } from './fx.js';
 import * as progress from '../state/progress.js';
 
@@ -68,21 +69,20 @@ function build(spec) {
 function place() { players.forEach(p => { p.style.left = pos[1] * cell + cell * .12 + 'px'; p.style.top = pos[0] * cell + cell * .12 + 'px'; }); }
 const bump = d => d.nodes.forEach(n => { n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); });
 
-// The hub is a 2-column grid of world doors inside a one-cell margin; you walk around the ring of free cells.
-const HUB_COLS = 2;
+// The hub is a compact 3x3 crossroads: a world door in each corner, a plus-shaped trail, you start in the centre.
+const CORNERS = [[0, 0], [0, 2], [2, 0], [2, 2]], EDGES = [[0, 1], [1, 0], [1, 2], [2, 1]];
 export function showHub(from) {
-  const n = WORLDS.length, rows = Math.ceil(n / HUB_COLS), H = rows + 2, W = HUB_COLS + 2;
-  const spot = i => [1 + Math.floor(i / HUB_COLS), 1 + (i % HUB_COLS)];
-  // start on the bottom edge; coming back, stand beside the door you left (left or right margin)
-  pos = from == null ? [H - 1, 1] : [spot(from)[0], (from % HUB_COLS) ? W - 1 : 0];
+  // coming back, stand on the edge cell beside the door you left
+  pos = from == null ? [1, 1] : [CORNERS[from][0], 1];
   const doors = WORLDS.map((w, i) => {
-    const open = progress.worldOpen(i), [r, c] = spot(i);
+    const open = progress.worldOpen(i), [r, c] = CORNERS[i];
     return {
       r, c, cls: open ? '' : 'locked', color: `hsl(${w.hue} 85% 56%)`,
       fill(b) {
         b.title = w.name; b.setAttribute('aria-label', w.name);
         if (!open) { b.appendChild(svgIcon(LOCK_SVG, 'lock')); return; }
         b.appendChild(svgIcon(w.icon, 'glyph'));
+        if (progress.worldPerfect(i)) el('star', b).textContent = '\u2605';       // every level incl. challenges
         const pips = el('pips', b), cnt = progress.worldCount(i), tot = progress.mainTotal(i);
         for (let l = 0; l < tot; l++) { const p = document.createElement('i'); if (l < cnt) p.className = 'on'; pips.appendChild(p); }
       },
@@ -92,9 +92,10 @@ export function showHub(from) {
       },
     };
   });
+  const path = new Set([[1, 1], ...EDGES].map(([r, c]) => r + ',' + c));
   room = null;
-  build({ W, H, hue: null, doors });
-  room.mode = 'hub';
+  build({ W: 3, H: 3, hue: null, doors, map: { m: { walls: new Set(), path } } });
+  room.mode = 'hub'; announce('Choose a world');
 }
 
 export function showWorld(w, from) {
@@ -110,8 +111,8 @@ export function showWorld(w, from) {
         if (!open) { b.appendChild(svgIcon(LOCK_SVG, 'lock')); return; }       // greyed out until its group is reachable
         const p = previewURL(d, size);
         const mini = el('mini', b); mini.style.cssText = `width:${p.w}px;height:${p.h}px;background-image:url(${p.url})`;
-        el('num', b).textContent = d.challenge ? '\u2605' : l + 1;
-        if (progress.isDone(w, l)) el('tick', b).textContent = '\u2713';
+        b.classList.add(progress.isDone(w, l) ? 'done' : 'todo');      // green outline = solved, grey = still to do
+        b.setAttribute('aria-label', 'Level ' + (l + 1) + (progress.isDone(w, l) ? ', solved' : ''));
       },
       act(o) { if (open) { sfx.enterLevel(); nav.level(w, l, o); } else { bump(this); sfx.locked(); } },
     };
@@ -119,7 +120,7 @@ export function showWorld(w, from) {
   doors.push({ r: m.exit[0], c: m.exit[1], cls: 'exit',
     fill(b) { b.appendChild(svgIcon(BACK_SVG, 'icon')); }, act() { sfx.back(); nav.hub(w); } });
   build({ W: m.W, H: m.H, hue: def.hue, bot: def.bot, doors, map: { m, rows: m.rows } });
-  room.mode = 'world';
+  room.mode = 'world'; announce(def.name + ': choose a level');
 }
 // a free cell beside a door, preferring below it
 function standNextTo(m, [r, c]) {

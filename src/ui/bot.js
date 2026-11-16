@@ -28,6 +28,14 @@ export function stepBot(node, dr, dc) {
   schedule(); setTimeout(schedule, 720);
 }
 
+// a refused move: shove toward the obstacle and bounce back
+export function bonkBot(node, dr, dc) {
+  moveDir = [dr, dc]; lastMove = performance.now();
+  const q = node.sq.style; q.setProperty('--lx', dc); q.setProperty('--ly', dr); q.setProperty('--ax', Math.abs(dc)); q.setProperty('--ay', Math.abs(dr));
+  node.sq.classList.remove('hop', 'bonk'); void node.sq.offsetWidth; node.sq.classList.add('bonk');
+  schedule(); setTimeout(schedule, 720);
+}
+
 if (typeof window !== 'undefined') {
   addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; lastPointer = performance.now(); schedule(); });
   // idle: every couple of seconds glance somewhere small, so it never looks frozen

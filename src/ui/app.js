@@ -19,7 +19,12 @@ export function startApp() {
   // going into something zooms in (from the door you chose); coming back zooms out
   const idle = () => setPadState({ undo: false, redo: false, reset: false });
   nav.title = first => swap(() => { mode = 'title'; idle(); showTitle(); }, { dir: 'out', first });
-  nav.start = () => { if (isBusy() || mode !== 'title') return; sfx.unlock(); sfx.enterWorld(); swap(() => { mode = 'hub'; idle(); showHub(null); }, { dir: 'in' }); };
+  nav.start = () => {
+    if (isBusy() || mode !== 'title') return; sfx.unlock(); sfx.enterWorld();
+    // first ever play: straight into the first level
+    if (progress.totals().solved === 0) return swap(() => { mode = 'level'; world = 0; level.start(0, 0); }, { dir: 'in' });
+    swap(() => { mode = 'hub'; idle(); showHub(null); }, { dir: 'in' });
+  };
   nav.hub = (from, first) => swap(() => { mode = 'hub'; idle(); showHub(from); }, { dir: 'out', first });
   nav.world = (w, from, origin) => swap(() => { mode = 'world'; world = w; idle(); showWorld(w, from); }, from == null ? { dir: 'in', origin } : { dir: 'out' });
   nav.level = (w, l, origin) => swap(() => { mode = 'level'; world = w; level.start(w, l); }, { dir: 'in', origin });
@@ -29,7 +34,7 @@ export function startApp() {
     gesture: () => sfx.unlock(),
     confirm: () => { if (menuOpen()) menuActivate(); else if (mode === 'title') nav.start(); },
     dir: (dr, dc) => { if (menuOpen()) return menuDir(dr, dc); if (isBusy()) return; if (mode === 'title') return nav.start(); if (mode === 'level') level.move(dr, dc); else roomMove(dr, dc); },
-    undo: () => { if (menuOpen()) menuActivate(); else if (mode === 'title') nav.start(); else if (!isBusy() && mode === 'level') level.undo(); },
+    undo: () => { if (menuOpen()) return closeMenu(); if (isBusy()) return; if (mode === 'level') level.undo(); else if (mode === 'hub' || mode === 'world') handlers.back(); },
     redo: () => { if (!menuOpen() && !isBusy() && mode === 'level') level.redo(); },
     restart: () => { if (!menuOpen() && !isBusy() && mode === 'level' && !level.isBusy()) level.restart(); },
     back: () => {

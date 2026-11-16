@@ -29,6 +29,7 @@ export const sfx = {
   back:       () => play('navigate', { direction: 'back' }),           // back door / Esc in a room
   locked:     cue('error'),                                            // refused: world still locked
   unlocked:   cue('ready',  { emphasis: 'strong' }),                   // a new world is available
+  finale:     () => { play('success', { emphasis: 'strong' }); setTimeout(() => play('ready', { emphasis: 'strong' }), 420); },   // beat the game / 100%
 };
 sfx.pick = cue('select');                // a menu row moved
 sfx.confirm = cue('tap', { input: 'keyboard' });   // a menu row chosen

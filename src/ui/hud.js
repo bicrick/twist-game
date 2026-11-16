@@ -11,3 +11,6 @@ export function placeTop() {
   top.style.width = f.offsetWidth + 'px';
   top.style.top = st.offsetTop + f.offsetTop - (+f.dataset.rimTop || 0) + 'px';   // sit above a wall rim, if any
 }
+
+// screen-reader announcements (the visual UI has no text): polite live region
+export function announce(text) { const l = $('live'); if (!l) return; l.textContent = ''; setTimeout(() => { l.textContent = text; }, 40); }
