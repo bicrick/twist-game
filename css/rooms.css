@@ -20,9 +20,13 @@
 .trails { position: absolute; left: 0; top: 0; pointer-events: none; }
 .trails path { fill: none; stroke: var(--trail); stroke-linecap: round; stroke-linejoin: round; }
 
-/* optional challenge levels: a golden ring and star */
-.door.challenge { box-shadow: 0 0 0 calc(var(--cell) * .05) #f5b400, 0 calc(var(--cell) * .05) 0 rgba(0,0,0,.35); }
-.door.challenge .num { color: #fff3c4; font-size: calc(var(--cell) * .24); }
+/* optional challenge levels: a golden ring while unsolved */
+.door.challenge.todo { --ring: #f5b400; }
+
+/* level cards: no numbers or ticks, just an outline: grey = to do, green = solved */
+.door.todo, .door.done { --ring: rgba(255,255,255,.36); box-shadow: 0 0 0 calc(var(--cell) * .06) var(--ring), 0 calc(var(--cell) * .05) 0 calc(var(--cell) * .06) rgba(0,0,0,.35); }
+.door.challenge.todo { --ring: #f5b400; }
+.door.done { --ring: var(--okc); }
 
 /* a world with every level (challenges too) solved gets a gold star */
 .door .star { position: absolute; right: 6%; top: 6%; width: 26%; height: 26%; border-radius: 34%; background: #ffd23f; color: #5a3b00; display: grid; place-items: center; font: 800 calc(var(--cell) * .16)/1 var(--font); z-index: 3; }

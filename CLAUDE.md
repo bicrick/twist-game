@@ -20,6 +20,7 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 - Flow: first-ever Play goes straight into Twist level 1 (skip hub); levels auto-advance only within a group, the end of a group returns to the world room; the last main level of a world returns to the hub. Hub = compact 3x3 crossroads (a world door in each corner, plus-shaped trail, start in the centre). Refused moves play a `bonk` shove (`bonkBot`).
 - Boards WITH reflections are square-edged (+ rim bars); boards WITHOUT (hub, rooms, fully walled none/none levels: `#floor.solid`) are rounded with the walls' radius (`calc(var(--cell)*.32)`).
 - Menus are icon-first (pause = grid of icon tiles incl. a cog, settings = icon rows with switch / bar / dot controls, caption names the focused item). Whole game: WASD/arrows move/navigate, Space/Enter choose (title: Press space), Z = undo in a level / back everywhere else, Esc = pause / back, Tab/p menu.
+- Level cards in a world room have no numbers or ticks: grey outline = to do, green = solved, gold = unsolved challenge (`.door.todo/.done`).
 - Controls: WASD/arrows move, `z` undo, `y` redo, `r` reset level, `Esc` pause menu (in a level) / back, `Tab`/`p` menu, `n` mute, Enter/Space start. Touch: on-screen pad (below) or swipe.
 
 ## Layout (one concern per file; keep it that way)

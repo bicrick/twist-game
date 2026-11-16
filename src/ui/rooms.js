@@ -111,8 +111,8 @@ export function showWorld(w, from) {
         if (!open) { b.appendChild(svgIcon(LOCK_SVG, 'lock')); return; }       // greyed out until its group is reachable
         const p = previewURL(d, size);
         const mini = el('mini', b); mini.style.cssText = `width:${p.w}px;height:${p.h}px;background-image:url(${p.url})`;
-        el('num', b).textContent = d.challenge ? '\u2605' : l + 1;
-        if (progress.isDone(w, l)) el('tick', b).textContent = '\u2713';
+        b.classList.add(progress.isDone(w, l) ? 'done' : 'todo');      // green outline = solved, grey = still to do
+        b.setAttribute('aria-label', 'Level ' + (l + 1) + (progress.isDone(w, l) ? ', solved' : ''));
       },
       act(o) { if (open) { sfx.enterLevel(); nav.level(w, l, o); } else { bump(this); sfx.locked(); } },
     };
