@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tools/check_levels.js",
+    "test": "node tools/check_levels.js && node tools/check_haptics.js",
     "paths": "node tools/paths.js",
     "deploy": "vercel deploy --prod --yes --build-env COMMIT=$(git rev-parse --short HEAD)"
   },

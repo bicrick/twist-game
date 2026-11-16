@@ -1,5 +1,7 @@
 // Real-device diagnostics: open the game with ?debug=1 and screenshot the little panel. Only loaded on demand.
 import * as settings from '../state/settings.js';
+import { offered } from './haptics.js';
+import { inAppWebView } from './shell.js';
 
 export function initDebug() {
   const box = document.createElement('div');
@@ -24,6 +26,7 @@ export function initDebug() {
       `safe-area t${cs.paddingTop} r${cs.paddingRight} b${cs.paddingBottom} l${cs.paddingLeft}\n` +
       `standalone ${mq('(display-mode: standalone)') || navigator.standalone === true}  sw ${sw}  online ${navigator.onLine}\n` +
       `gesture ${navigator.userActivation ? navigator.userActivation.hasBeenActive : 'n/a'}  sound ${settings.get('sound')} vol ${settings.get('volume')} ${settings.get('style')}\n` +
+      `haptics setting ${settings.get('haptics')} offered ${offered()} vibrate ${typeof navigator.vibrate} inApp ${inAppWebView()}\n` +
       `reduceMotion ${settings.get('reduceMotion')} (os ${mq('(prefers-reduced-motion: reduce)')})  ${navigator.userAgent.replace(/\(.*?\)/, '').slice(0, 60)}`;
   }, 500);
 }

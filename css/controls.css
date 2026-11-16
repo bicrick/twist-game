@@ -1,7 +1,7 @@
 /* On-screen gamepad (Game Boy Advance emulator style). Shown on touch / small screens via html.with-pad.
    Restyle with the tokens below; layout is plain absolute positioning. */
 :root { --pad-body: #0b1117; --pad-body-2: #0b1117; --pad-key: #1d2a35; --pad-key-hi: #2c3e4d; --pad-a: #2f7bff; --pad-b: #3ddc84;
-        --pad-label: rgba(255,255,255,.45); --pad-u: clamp(38px, 6.2vh, 54px); --pad-side: clamp(150px, 24vw, 210px); }
+        --pad-label: rgba(255,255,255,.45); --pad-u: clamp(38px, 6.2vh, 54px); --pad-u: clamp(38px, 6.2dvh, 54px); --pad-side: clamp(150px, 24vw, 210px); }
 #pad { display: none; }
 html.with-pad #device { background: var(--pad-body); }
 html.with-pad #pad { display: block; position: absolute; z-index: 50; touch-action: none; }
@@ -9,17 +9,17 @@ html.with-pad #screen { border-radius: 12px; box-shadow: 0 0 0 2px #1d2a35; back
 
 /* portrait: screen on top, pad below */
 @media (orientation: portrait) {
-  html.with-pad #screen { inset: 14px 14px calc(var(--pad-h) + 4px) 14px; }
-  html.with-pad { --pad-h: clamp(176px, 26vh, 240px); }
-  html.with-pad #pad { left: 0; right: 0; bottom: 0; height: var(--pad-h); }
+  html.with-pad #screen { top: max(14px, env(safe-area-inset-top, 0px)); right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(var(--pad-h) + max(4px, env(safe-area-inset-bottom, 0px))); left: max(14px, env(safe-area-inset-left, 0px)); }
+  html.with-pad { --pad-h: clamp(176px, 26vh, 240px); --pad-h: clamp(176px, 26dvh, 240px); }
+  html.with-pad #pad { left: env(safe-area-inset-left, 0px); right: env(safe-area-inset-right, 0px); bottom: env(safe-area-inset-bottom, 0px); height: var(--pad-h); }
   .dpad { left: max(6%, calc(50% - 210px)); top: 46%; transform: translateY(-62%); }
   .acts { right: max(6%, calc(50% - 210px)); top: 42%; transform: translateY(-58%); }
-  html.with-pad .mid { left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); justify-content: center; }
+  html.with-pad .mid { left: 0; right: 0; bottom: 14px; justify-content: center; }
 }
 /* landscape: screen in the middle, D-pad left, buttons right */
 @media (orientation: landscape) {
-  html.with-pad #screen { inset: 10px var(--pad-side) 10px var(--pad-side); }
-  html.with-pad #pad { inset: 0; pointer-events: none; }
+  html.with-pad #screen { top: max(10px, env(safe-area-inset-top, 0px)); right: calc(var(--pad-side) + env(safe-area-inset-right, 0px)); bottom: max(10px, env(safe-area-inset-bottom, 0px)); left: calc(var(--pad-side) + env(safe-area-inset-left, 0px)); }
+  html.with-pad #pad { top: env(safe-area-inset-top, 0px); right: env(safe-area-inset-right, 0px); bottom: env(safe-area-inset-bottom, 0px); left: env(safe-area-inset-left, 0px); pointer-events: none; }
   .dpad { left: calc(var(--pad-side) / 2); top: 50%; transform: translate(-50%, -58%); }
   .acts { right: calc(var(--pad-side) / 2); top: 50%; transform: translate(50%, -58%); }
   html.with-pad .mid { left: 0; right: 0; bottom: 14px; justify-content: space-between; padding: 0 calc(var(--pad-side) / 2 - 44px); }

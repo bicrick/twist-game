@@ -26,7 +26,8 @@ export function showTitle() {
     b.style.cssText = `left:${x}%;top:${y}%;width:${s}px;height:${shape === 'capsule' ? Math.round(s * 1.3) : s}px;--bc:${TINTS[t]};animation-duration:${dur}s;animation-delay:${delay}s`;
     b.innerHTML = FBOT;
   });
-  const H = Math.round(Math.min(Math.max(Math.min(innerWidth, innerHeight) * .3, 96), 190));
+  const box = $('screen').getBoundingClientRect();
+  const H = Math.round(Math.min(Math.max(Math.min(box.width || innerWidth, box.height || innerHeight) * .3, 96), 190));
   const hero = el('hero', root), bot = piece('player', hero, H);
   hero.style.width = hero.style.height = H + 'px'; hero.style.setProperty('--cell', H + 'px');
   bot.style.left = bot.style.top = '0'; orient(bot, { fx: 0, fy: 0 }); setActiveBot(bot, H);

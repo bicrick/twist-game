@@ -1,11 +1,12 @@
 // Original OST beds (public/music/*.m4a). Web Audio player: lazy-load, gapless loop, crossfade.
 // Music prefs live in localStorage `twist-music` (never written into `twist-settings`).
 import { WORLDS } from '../data/worlds.js';
+import { getItem, setItem } from '../state/storage.js';
 
 const KEY = 'twist-music';
 const defaults = { enabled: true, volume: 0.6 };
 let prefs = { ...defaults };
-try { prefs = { ...defaults, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch (e) {}
+try { prefs = { ...defaults, ...JSON.parse(getItem(KEY) || '{}') }; } catch (e) {}
 
 const FILES = {
   title: 'music/title.m4a',
@@ -35,7 +36,7 @@ const layers = {
 export const get = k => prefs[k];
 export function set(k, v) {
   prefs[k] = v;
-  try { localStorage.setItem(KEY, JSON.stringify(prefs)); } catch (e) {}
+  setItem(KEY, JSON.stringify(prefs));
   applyGain();
 }
 export const toggle = () => { set('enabled', !prefs.enabled); return prefs.enabled; };
@@ -45,9 +46,24 @@ export function sync({ masterEnabled: on } = {}) {
   applyGain();
 }
 
+let primed = false;
 export function unlock() {
-  ensureCtx();
-  if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+  const c = ensureCtx();
+  if (!c) return;
+  // Don't touch the context before a gesture: a buffer started too early sticks some WKWebViews silent.
+  if (typeof navigator !== 'undefined' && navigator.userActivation && navigator.userActivation.hasBeenActive === false) return;
+  // iOS WKWebViews (the X in-app browser) stay silent if the context was created
+  // before the gesture unless resume() and a buffer start happen in that turn.
+  if (c.state !== 'running') c.resume().catch(() => {});
+  if (primed) return;
+  try {
+    const buf = c.createBuffer(1, 1, c.sampleRate || 22050);
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    src.connect(c.destination);
+    src.start(0);
+    primed = true;
+  } catch (e) {}
 }
 
 export function trackFor(mode, worldIndex) {
@@ -96,9 +112,8 @@ function applyGain() {
 }
 
 function urlFor(id) {
-  // Vite `base: './'` — keep music URLs relative to the document so Pages / subpaths work.
-  const base = document.baseURI || location.href;
-  return new URL(FILES[id], base).href;
+  // Root-absolute: /embed and /embed/ must not resolve music under /embed/.
+  return new URL(FILES[id], location.origin + '/').href;
 }
 
 function decodeBuf(ab) {

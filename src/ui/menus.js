@@ -4,6 +4,7 @@ import * as settings from '../state/settings.js';
 import * as progress from '../state/progress.js';
 import { nav } from './nav.js';
 import * as music from '../audio/music.js';
+import { offered as hapticsOffered, pulse as hapticPulse, silence as hapticSilence } from './haptics.js';
 
 // Feather-style stroke icons (inner SVG, 24x24)
 const I = {
@@ -40,7 +41,9 @@ export function openSettings() {
       set: i => settings.set('style', settings.STYLES[i]), step: d => { const n = settings.STYLES.length; settings.set('style', settings.STYLES[(settings.STYLES.indexOf(settings.get('style')) + d + n) % n]); } },
     { icon: I.motion, label: 'Reduce motion', kind: 'switch', on: () => settings.get('reduceMotion'), act: flip('reduceMotion') },
     { icon: I.trail, label: 'Bot trail', kind: 'switch', on: () => settings.get('trail'), act: flip('trail') },
-    { icon: I.haptic, label: 'Haptics', kind: 'switch', on: () => settings.get('haptics'), act: flip('haptics') },
+    { icon: I.haptic, label: () => hapticsOffered() ? 'Haptics' : 'Haptics unavailable', kind: 'switch',
+      inert: () => !hapticsOffered(), on: () => settings.get('haptics'),
+      act() { const next = !settings.get('haptics'); settings.set('haptics', next); if (next) hapticPulse(); else hapticSilence(); } },
     { icon: I.trash, danger: true, label: () => erased ? 'Progress erased' : confirmReset ? 'Press again to erase everything' : 'Reset progress', kind: 'button',
       act() { if (!confirmReset) { confirmReset = true; return; } progress.reset(); confirmReset = false; erased = true; } },
     { icon: I.back, label: 'Back', kind: 'button', act: () => closeMenu() },
