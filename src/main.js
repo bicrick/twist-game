@@ -1,12 +1,8 @@
-import { inject } from '@vercel/analytics';
 import { startApp } from './ui/app.js';
 import { inAppWebView } from './ui/shell.js';
 
 window.__BUILD__ = typeof __BUILD__ !== 'undefined' ? __BUILD__ : 'dev';
 startApp();
-// Vercel Web Analytics only (not Speed Insights). Production builds call inject(), which
-// adds /_vercel/insights/script.js. Dev does not load the debug script.
-if (import.meta.env.PROD) inject({ mode: 'production' });
 // ?debug=1 shows a small diagnostics panel (fps, viewport, touch, safe area...) for real-device testing
 if (/[?&]debug=1/.test(location.search)) import('./ui/debug.js').then(m => m.initDebug());
 
