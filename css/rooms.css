@@ -23,3 +23,6 @@
 /* optional challenge levels: a golden ring and star */
 .door.challenge { box-shadow: 0 0 0 calc(var(--cell) * .05) #f5b400, 0 calc(var(--cell) * .05) 0 rgba(0,0,0,.35); }
 .door.challenge .num { color: #fff3c4; font-size: calc(var(--cell) * .24); }
+
+/* a world with every level (challenges too) solved gets a gold star */
+.door .star { position: absolute; right: 6%; top: 6%; width: 26%; height: 26%; border-radius: 34%; background: #ffd23f; color: #5a3b00; display: grid; place-items: center; font: 800 calc(var(--cell) * .16)/1 var(--font); z-index: 3; }

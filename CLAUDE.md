@@ -1,6 +1,6 @@
 # Twist
 
-A puzzle game: a Patrick's-Parabox-style world of glued / twisted / solid edges, populated by Grok-bot-style clay bots. Static web game (vanilla JS ES modules + CSS, Vite). Plays on desktop and mobile; installable (manifest + offline service worker).
+A puzzle game: a Patrick's-Parabox-style world of glued / twisted / solid edges, populated by Grok-bot-style clay bots. Static web game (vanilla JS ES modules + CSS, Vite). Plays on desktop and mobile; installable (manifest, PNG + apple-touch icons, offline service worker).
 The whole idea, in the user's words: *a Grok-bot-esque twist on Patrick's Parabox*. Keep it original (not a clone): own mechanics, own title screen, own bots.
 
 ## Run / test
@@ -32,6 +32,7 @@ Every piece has orientation {fx, fy}. Win: every target has a block with identic
 - Dark, hue-tinted worlds (per-world hue in `ui/theme.js`), a white 2px bounding frame, **bright clay wall slabs that merge** with each other and with the solid-edge rim (`wn/we/ws/ww` classes in `level.js`), soft shadows, system sans. Boards are SQUARE-edged (glued worlds tile edge-to-edge with faded mirrored reflections); everything else is squircle. No seam lines. Solid edges are a flat wall rim (`.rim`, square-ended).
 - Each world has its own bot: lopsided on purpose so orientation reads from the outline (cloud / teardrop / hexagon / triangle, each a different colour that never matches the world's wall hue). Eyes follow the pointer / last move, blink, idle-glance; squash + hop per step; puffs trail behind. Goals are outlines of the same bot / pebble; they turn green when matched.
 - Home screen: its own identity (hero bot watching your pointer, rounded "Twist", Play, crowd of varied bots). Do NOT mimic Parabox's title (no keycaps, no gray squares, no framed-letter wordmark). Dim squircle particles drift behind every screen.
+- Completion: a hub world with EVERY level (challenges too) solved gets a gold star; beating the last world plays a one-time finale (confetti of tiny bots, `ui/celebrate.js`) and solving all 36 plays a second, golden one (`twist-flags` in storage, cleared by Reset progress). Screen readers get polite announcements (`announce()` in `ui/hud.js`).
 - Text only: no banners, no level title chip, no hint text. Back button is fine.
 - Menu rooms are plain framed boxes, compact (doors adjacent, joined by short connectors); no reflections in menus. A room map is ROTATED to match the screen (wide map on a portrait phone -> upright, tall map on a landscape screen -> on its side; `transpose` in `data/roommap.js`) so doors stay big; same topology, so walking directions differ by orientation.
 - Solid borders are ONE full-brightness rim bar running the full length across all reflections (drawn on the floor, not inside the faded copies); no white frame on glued edges.

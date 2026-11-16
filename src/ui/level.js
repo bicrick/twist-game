@@ -3,6 +3,8 @@ import { $, el } from './dom.js';
 import { createBoard } from './board.js';
 import { piece, orient } from './pieces.js';
 import { theme } from './theme.js';
+import { announce } from './hud.js';
+import { celebrate } from './celebrate.js';
 import { setActiveBot, stepBot } from './bot.js';
 import { puff } from './fx.js';
 import { levelCell, LEVEL_MARGIN } from './layout.js';
@@ -24,6 +26,7 @@ export const isBusy = () => busy;
 export function start(w, l) {
   wi = w; li = l; state = parseLevel(WORLDS[w].levels[l]); hist = []; dirs = []; redoStack = []; prev = {}; busy = false;
   build(); notify();
+  announce(WORLDS[w].name + ', ' + (WORLDS[w].levels[l].challenge ? 'challenge' : 'level ' + (l + 1)));
 }
 export const restart = () => { sfx.restart(); swap(() => start(wi, li), { dir: 'fade' }); };
 export const leave = () => { sfx.leave(); nav.world(wi, li); };
@@ -147,7 +150,7 @@ function update() {
 
 function checkWin() {
   if (!isWin(state)) return;
-  busy = true; sfx.win(); notify();
+  busy = true; sfx.win(); notify(); announce('Solved');
   const was = progress.worldDone(wi); progress.markDone(wi, li);
   completed = !was && progress.worldDone(wi) ? wi : null;           // optional challenge levels never complete a world
   $('stage').classList.add('win');
@@ -178,11 +181,16 @@ export function redo() {
 function finish() {
   busy = false;
   const levels = WORLDS[wi].levels, next = li + 1;
+  const last = WORLDS.length - 1;
+  // one-time moments: beating the last world, and 100% of everything
+  const finale = completed === last && !progress.flag('finale'), perfect = progress.allPerfect() && !progress.flag('perfect');
+  if (finale) progress.setFlag('finale'); if (perfect) progress.setFlag('perfect');
   if (completed !== null) {                       // that was the last missing main level of the world
     const w = completed; completed = null; nav.hub(w);
     sfx.unlocked();
   } else if (next < levels.length && !levels[next].challenge && !levels[li].challenge) nav.level(wi, next);   // carry straight on
   else nav.world(wi, li);                          // end of the main run, or a challenge: back to the room
+  if (finale || perfect) setTimeout(() => celebrate(perfect ? 'perfect' : 'clear'), 750);
 }
 export const rebuild = () => build();
 export const peek = () => ({ player: state.player, blocks: state.blocks, hist: hist.length, redo: redoStack.length });   // for tests

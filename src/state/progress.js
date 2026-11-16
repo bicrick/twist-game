@@ -26,8 +26,15 @@ export const levelOpen = (w, l) => {
   return gi <= 0 || gs[gi - 1].every(x => isDone(w, x));
 };
 export const challengeCount = w => WORLDS[w].levels.filter((d, l) => d.challenge && isDone(w, l)).length;
+export const worldPerfect = w => WORLDS[w].levels.every((_, l) => isDone(w, l));   // main + challenges
+export const allPerfect = () => WORLDS.every((_, w) => worldPerfect(w));
+// one-time moments (the finale, 100%) so they only play once
+const FLAGS = 'twist-flags'; let flags = {};
+try { flags = JSON.parse(localStorage.getItem(FLAGS) || '{}'); } catch (e) {}
+export const flag = k => !!flags[k];
+export const setFlag = k => { flags[k] = 1; try { localStorage.setItem(FLAGS, JSON.stringify(flags)); } catch (e) {} };
 export const allDone = () => done;
-export const reset = () => { done = {}; save(); };
+export const reset = () => { done = {}; flags = {}; save(); try { localStorage.removeItem(FLAGS); } catch (e) {} };
 export const totals = () => {
   const total = WORLDS.reduce((n, w) => n + w.levels.length, 0);
   const solved = Object.keys(done).filter(k => { const [w, l] = k.split(':').map(Number); return WORLDS[w] && l < WORLDS[w].levels.length; }).length;

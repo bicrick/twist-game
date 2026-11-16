@@ -11,6 +11,7 @@ import { WORLDS } from '../data/worlds.js';
 import { parseMap, transpose, joined, isDoor } from '../data/roommap.js';
 import { previewURL } from './preview.js';
 import { setActiveBot, stepBot } from './bot.js';
+import { announce } from './hud.js';
 import { puff } from './fx.js';
 import * as progress from '../state/progress.js';
 
@@ -83,6 +84,7 @@ export function showHub(from) {
         b.title = w.name; b.setAttribute('aria-label', w.name);
         if (!open) { b.appendChild(svgIcon(LOCK_SVG, 'lock')); return; }
         b.appendChild(svgIcon(w.icon, 'glyph'));
+        if (progress.worldPerfect(i)) el('star', b).textContent = '\u2605';       // every level incl. challenges
         const pips = el('pips', b), cnt = progress.worldCount(i), tot = progress.mainTotal(i);
         for (let l = 0; l < tot; l++) { const p = document.createElement('i'); if (l < cnt) p.className = 'on'; pips.appendChild(p); }
       },
@@ -94,7 +96,7 @@ export function showHub(from) {
   });
   room = null;
   build({ W, H, hue: null, doors });
-  room.mode = 'hub';
+  room.mode = 'hub'; announce('Choose a world');
 }
 
 export function showWorld(w, from) {
@@ -119,7 +121,7 @@ export function showWorld(w, from) {
   doors.push({ r: m.exit[0], c: m.exit[1], cls: 'exit',
     fill(b) { b.appendChild(svgIcon(BACK_SVG, 'icon')); }, act() { sfx.back(); nav.hub(w); } });
   build({ W: m.W, H: m.H, hue: def.hue, bot: def.bot, doors, map: { m, rows: m.rows } });
-  room.mode = 'world';
+  room.mode = 'world'; announce(def.name + ': choose a level');
 }
 // a free cell beside a door, preferring below it
 function standNextTo(m, [r, c]) {
